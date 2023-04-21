@@ -11,7 +11,7 @@ const middleware = async (req) => {
 };
 
 export const config = {
-  matcher: ["/", "/stock", "/stock/:path*"],
+  matcher: ["/", "/feature", "/feature/:path*"],
 };
 
 export default middleware;

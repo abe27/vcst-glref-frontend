@@ -67,12 +67,12 @@ export const authOptions = {
           isAdmin: user.data.user.permission.title === "Administrator",
           avatar_url: user.data.user.avatar_url,
           accessToken: `${user.data.type} ${user.data.token}`,
-          company: user.data.user.company.id,
-          position: user.data.user.position.id,
-          section: user.data.user.section.id,
-          department: user.data.user.department.id,
-          permission: user.data.user.permission.id,
-          whs: user.data.user.whs.id,
+          company: user.data.user.company,
+          position: user.data.user.position,
+          section: user.data.user.section,
+          department: user.data.user.department,
+          permission: user.data.user.permission,
+          whs: user.data.user.whs,
         };
       }
 
