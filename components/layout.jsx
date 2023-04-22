@@ -1,19 +1,17 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @next/next/no-img-element */
-import React, { useEffect, useState } from "react";
+import {
+  Avatar,
+  Dropdown,
+  Navbar,
+  Text,
+  styled,
+  useTheme,
+} from "@nextui-org/react";
 import { useSession } from "next-auth/react";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import {
-  Navbar,
-  Text,
-  Button,
-  Link,
-  useTheme,
-  styled,
-  Avatar,
-  Dropdown,
-} from "@nextui-org/react";
+import { useEffect } from "react";
 import { icons } from "./elements/Icons";
 
 const Box = styled("div", {
@@ -160,7 +158,7 @@ const MainLayout = ({
                     description="จัดการข้อมูลการรับสินค้าเข้าคลัง"
                     icon={icons.edit}
                   >
-                    Receive
+                    Receive MRRP
                   </Dropdown.Item>
                   <Dropdown.Item
                     key="usage_metrics"

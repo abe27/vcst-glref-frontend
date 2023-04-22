@@ -40,7 +40,7 @@ const DateTime = (dte) => {
     "0" + d.getDate()
   ).slice(-2)} ${("0" + d.getHours()).slice(-2)}:${("0" + d.getMinutes()).slice(
     -2
-  )}`;
+  )}:${("0" + d.getSeconds()).slice(-2)}`;
 };
 
 const DateTimeEdi = () => {
@@ -310,6 +310,10 @@ const ColorInt = (x) => {
   return color[x - 1];
 };
 
+const TrimeSpace = (x) => {
+  return null;
+};
+
 export {
   DateTime,
   DateOnly,
@@ -335,4 +339,5 @@ export {
   GetHeader,
   PostHeader,
   UploadHeader,
+  TrimeSpace,
 };

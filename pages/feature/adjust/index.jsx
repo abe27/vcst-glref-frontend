@@ -5,8 +5,10 @@ import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { MainLayout } from "@/components";
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 const AdjustmentPage = () => {
+  const router = useRouter();
   const { data: session } = useSession();
   const [reloading, setReloading] = useState(false);
   const [glRefData, setGlRefData] = useState([]);
@@ -48,15 +50,14 @@ const AdjustmentPage = () => {
   };
 
   useEffect(() => {
-    fetchData();
+    if (session?.user) {
+      fetchData();
+    }
   }, [fddate]);
 
   useEffect(() => {
-    if (session?.user) {
-      let d = new Date();
-      setFdDate(DateOnly(d));
-      // setFdDate("2022-12-31");
-    }
+    let d = new Date();
+    setFdDate(DateOnly(d));
   }, []);
   return (
     <MainLayout title="Adjustment Page" description="จัดการข้อมูลการรับสินค้า">
@@ -88,7 +89,8 @@ const AdjustmentPage = () => {
                 </svg>
               </span>
               <span>
-                Activity(<span className="text-blue-500">100</span>)
+                Activity(
+                <span className="text-blue-500">{glRefData.length}</span>)
               </span>
             </li>
             <li className="flex items-center mr-3 mt-3 md:mt-0">
@@ -159,7 +161,13 @@ const AdjustmentPage = () => {
               Reload
             </Button>
           )}
-          <Button auto color={`warning`} size={`sm`} ripple>
+          <Button
+            auto
+            color={`warning`}
+            size={`sm`}
+            ripple
+            onPress={() => router.push("/feature/adjust/add")}
+          >
             Add New
           </Button>
         </div>
