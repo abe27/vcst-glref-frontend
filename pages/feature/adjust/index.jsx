@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { DateOnly, DateTime } from "@/hooks";
+import { DateOnly, DateString, DateTime } from "@/hooks";
 import { Button, Input, Loading, Table } from "@nextui-org/react";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
@@ -48,16 +48,16 @@ const AdjustmentPage = () => {
   };
 
   useEffect(() => {
-    if (session?.user) {
-      fetchData();
-    }
+    fetchData();
   }, [fddate]);
 
   useEffect(() => {
-    let d = new Date();
-    setFdDate(DateOnly(d));
-    // setFdDate("2022-12-31");
-  }, [session]);
+    if (session?.user) {
+      let d = new Date();
+      setFdDate(DateOnly(d));
+      // setFdDate("2022-12-31");
+    }
+  }, []);
   return (
     <MainLayout title="Adjustment Page" description="จัดการข้อมูลการรับสินค้า">
       <div className="lg:my-12 container px-6 mx-auto flex flex-col lg:flex-row items-start lg:items-center justify-between border-b border-gray-300">
@@ -138,7 +138,8 @@ const AdjustmentPage = () => {
                 </svg>
               </span>
               <span>
-                Updated on <span className="text-green-500">29 Jan 2020</span>
+                Updated on{" "}
+                <span className="text-green-500">{DateString(fddate)}</span>
               </span>
             </li>
           </ul>
@@ -186,10 +187,13 @@ const AdjustmentPage = () => {
           <Table.Header>
             <Table.Column>#</Table.Column>
             <Table.Column>Date</Table.Column>
+            <Table.Column>BOOK</Table.Column>
             <Table.Column>FCCODE.</Table.Column>
             <Table.Column>REFNO.</Table.Column>
             <Table.Column>QTY.</Table.Column>
-            <Table.Column>CCREATED BY</Table.Column>
+            <Table.Column>FROM</Table.Column>
+            <Table.Column>TO</Table.Column>
+            <Table.Column>REMARK</Table.Column>
             <Table.Column>STATUS.</Table.Column>
             <Table.Column></Table.Column>
           </Table.Header>
@@ -198,6 +202,7 @@ const AdjustmentPage = () => {
               <Table.Row key={x}>
                 <Table.Cell>{x + 1}</Table.Cell>
                 <Table.Cell>{DateOnly(i.fddate)}</Table.Cell>
+                <Table.Cell>{i.book.fcname}</Table.Cell>
                 <Table.Cell>
                   <span className="text-indigo-400">{i.fccode}</span>
                 </Table.Cell>
@@ -213,24 +218,19 @@ const AdjustmentPage = () => {
                     {i.fnamt.toLocaleString()}
                   </span>
                 </Table.Cell>
-                <Table.Cell>{i.created_by}</Table.Cell>
                 <Table.Cell>
-                  {i.fcbook.length > 0 && i.fnamt > 0 ? (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth={1.5}
-                      stroke="currentColor"
-                      className="w-6 h-6 text-green-600"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                  ) : (
+                  {i.from?.fccode !== undefined
+                    ? `${i.from?.fccode}-${i.from?.fcname}`
+                    : ``}
+                </Table.Cell>
+                <Table.Cell>
+                  {i.to?.fccode !== undefined
+                    ? `${i.to?.fccode}-${i.to?.fcname}`
+                    : ""}
+                </Table.Cell>
+                <Table.Cell>{i.fmmemdata}</Table.Cell>
+                <Table.Cell>
+                  <Button auto light size={"xs"}>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
@@ -245,7 +245,38 @@ const AdjustmentPage = () => {
                         d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                       />
                     </svg>
-                  )}
+                    {/* {i.fcbook.length > 0 && i.fnamt > 0 ? (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        stroke="currentColor"
+                        className="w-6 h-6 text-green-600"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                    ) : (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        stroke="currentColor"
+                        className="w-6 h-6 text-rose-500"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                    )} */}
+                  </Button>
                 </Table.Cell>
                 <Table.Cell>{DateTime(i.ftlastupd)}</Table.Cell>
               </Table.Row>
