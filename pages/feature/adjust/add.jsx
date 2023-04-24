@@ -4,7 +4,14 @@ import InputQty from "@/components/drawers/InputQty";
 import MainLayout from "@/components/layout";
 import { DateOnly, DateTime, DateTimePostman } from "@/hooks";
 import { useToast } from "@chakra-ui/react";
-import { Button, Container, Dropdown, Input, Table } from "@nextui-org/react";
+import {
+  Button,
+  Container,
+  Dropdown,
+  Input,
+  Table,
+  Textarea,
+} from "@nextui-org/react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
@@ -230,22 +237,22 @@ const AddNewAdjustPage = () => {
 
   return (
     <MainLayout>
-      <div className="lg:my-12 container px-6 mx-auto flex flex-col lg:flex-row items-start lg:items-center justify-between border-b border-gray-300">
-        <div>
-          <div className="flex justify-start w-80">
-            <h4 className="mt-3 text-sm font-bold leading-tight text-gray-800">
-              REC. DATE:&nbsp;&nbsp;
-            </h4>
-            <Input
-              color="primary"
-              type="date"
-              size="xs"
-              placeholder="0"
-              value={recDate}
-              onChange={(e) => setRecDate(e.target.value)}
-            />
-          </div>
+      <div className="lg:my-12 container px-6 mx-auto flex flex-col lg:flex-row items-start lg:items-center justify-between w-full">
+        <div className="mt-0">
           <div className="flex justify-start space-x-4">
+            <div className="flex w-80">
+              <h4 className="mt-3 text-sm font-bold leading-tight text-gray-800">
+                REC. DATE:&nbsp;&nbsp;
+              </h4>
+              <Input
+                color="primary"
+                type="date"
+                size="xs"
+                placeholder="0"
+                value={recDate}
+                onChange={(e) => setRecDate(e.target.value)}
+              />
+            </div>
             <div className="flex w-80">
               <Container gap={0} css={{ d: "flex", flexWrap: "nowrap" }}>
                 <div className="mt-3 text-sm font-bold leading-tight text-gray-800">
@@ -306,19 +313,21 @@ const AddNewAdjustPage = () => {
                 value={recQty.toLocaleString()}
               />
             </h4>
+          </div>
+          <div className="flex space-x-4">
             <h4 className="text-sm font-bold leading-tight text-gray-800">
-              REMARK:&nbsp;&nbsp;
-              <Input
-                clearable
-                size="xs"
-                placeholder="remark"
-                value={remark}
-                onChange={(e) => setRemark(e.target.value)}
-              />
+              REMARK:
             </h4>
+            <Textarea
+              fullWidth
+              clearable
+              placeholder="remark"
+              value={remark}
+              onChange={(e) => setRemark(e.target.value)}
+            />
           </div>
         </div>
-        <div className="flex space-x-2 mt-6 lg:mt-0">
+        <div className="flex space-x-2 mt-0">
           <Button
             auto
             light
@@ -340,72 +349,77 @@ const AddNewAdjustPage = () => {
           </Button>
         </div>
       </div>
-      <div className="flex justify-end pr-8">
+      <div className="border-b border-gray-300 w-full" />
+      <div className="flex justify-end pr-8 mt-2">
         <DrawerAddNewItem
           token={session?.user.accessToken}
           handleAddNew={handleAddNew}
         />
       </div>
-      <div className="mt-4 pl-8 pr-8">
-        <Table
-          shadow={false}
-          aria-label="Example pagination  table"
-          css={{
-            height: "auto",
-            minWidth: "100%",
-          }}
-          // selectionMode="multiple"
-        >
-          <Table.Header>
-            <Table.Column>#</Table.Column>
-            <Table.Column>FCCODE</Table.Column>
-            <Table.Column>FCNAME</Table.Column>
-            <Table.Column>QTY</Table.Column>
-            <Table.Column>UNIT</Table.Column>
-            <Table.Column></Table.Column>
-            <Table.Column></Table.Column>
-          </Table.Header>
-          <Table.Body>
-            {refData.map((i, x) => (
-              <Table.Row key={x}>
-                <Table.Cell>{("000" + (x + 1)).slice(-3)}</Table.Cell>
-                <Table.Cell>{i.prod.fccode}</Table.Cell>
-                <Table.Cell>{i.prod.fcname}</Table.Cell>
-                <Table.Cell>
-                  <InputQty obj={i} isConfirm={updateQty} />
-                </Table.Cell>
-                <Table.Cell>{i.unit.fcname}</Table.Cell>
-                <Table.Cell>{DateTime(i.ftlastupd)}</Table.Cell>
-                <Table.Cell>
-                  <Button
-                    light
-                    color="error"
-                    auto
-                    size={"xs"}
-                    rounded
-                    onPress={() => RemoveProduct(i.seq)}
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth={1.5}
-                      stroke="currentColor"
-                      className="w-6 h-6"
+      {refData.length > 0 ? (
+        <div className="mt-4 pl-8 pr-8">
+          <Table
+            shadow={false}
+            aria-label="Example pagination  table"
+            css={{
+              height: "auto",
+              minWidth: "100%",
+            }}
+            // selectionMode="multiple"
+          >
+            <Table.Header>
+              <Table.Column>#</Table.Column>
+              <Table.Column>FCCODE</Table.Column>
+              <Table.Column>FCNAME</Table.Column>
+              <Table.Column>QTY</Table.Column>
+              <Table.Column>UNIT</Table.Column>
+              <Table.Column></Table.Column>
+              <Table.Column></Table.Column>
+            </Table.Header>
+            <Table.Body>
+              {refData.map((i, x) => (
+                <Table.Row key={x}>
+                  <Table.Cell>{("000" + (x + 1)).slice(-3)}</Table.Cell>
+                  <Table.Cell>{i.prod.fccode}</Table.Cell>
+                  <Table.Cell>{i.prod.fcname}</Table.Cell>
+                  <Table.Cell>
+                    <InputQty obj={i} isConfirm={updateQty} />
+                  </Table.Cell>
+                  <Table.Cell>{i.unit.fcname}</Table.Cell>
+                  <Table.Cell>{DateTime(i.ftlastupd)}</Table.Cell>
+                  <Table.Cell>
+                    <Button
+                      light
+                      color="error"
+                      auto
+                      size={"xs"}
+                      rounded
+                      onPress={() => RemoveProduct(i.seq)}
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                  </Button>
-                </Table.Cell>
-              </Table.Row>
-            ))}
-          </Table.Body>
-        </Table>
-      </div>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        stroke="currentColor"
+                        className="w-6 h-6"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                    </Button>
+                  </Table.Cell>
+                </Table.Row>
+              ))}
+            </Table.Body>
+          </Table>
+        </div>
+      ) : (
+        <></>
+      )}
     </MainLayout>
   );
 };

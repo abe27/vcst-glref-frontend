@@ -1,4 +1,5 @@
 import "@/styles/globals.css";
+import "sweetalert2/src/sweetalert2.scss";
 import { SessionProvider } from "next-auth/react";
 import { Noto_Sans_Thai } from "next/font/google";
 

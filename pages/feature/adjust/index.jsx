@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { DateOnly, DateString, DateTime } from "@/hooks";
-import { Button, Input, Loading, Table } from "@nextui-org/react";
+import { Button, Input, Loading, Table, Tooltip } from "@nextui-org/react";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { MainLayout } from "@/components";
@@ -16,6 +16,7 @@ const AdjustmentPage = () => {
   const [limit, setLimit] = useState(100);
   const [offer, setOffer] = useState(1);
   const [fcrftype, setFcrfType] = useState("G");
+  const [filterGlrefNo, setFilterGlrefNo] = useState("");
   const [fddate, setFdDate] = useState("");
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
@@ -35,10 +36,10 @@ const AdjustmentPage = () => {
     //   `${process.env.API_HOST}/gl/ref?whs=${whs}&limit=${limit}&offer=${offer}&fcrftype=${fcrftype}&fddate=${fddate}`
     // );
     console.log(
-      `${process.env.API_HOST}/gl/ref?whs=${whs}&limit=${limit}&offer=${offer}&fddate=${fddate}`
+      `${process.env.API_HOST}/gl/ref?whs=${whs}&limit=${limit}&offer=${offer}&fddate=${fddate}&filterGlrefNo=${filterGlrefNo}`
     );
     const res = await fetch(
-      `${process.env.API_HOST}/gl/ref?whs=${whs}&limit=${limit}&offer=${offer}&fddate=${fddate}`,
+      `${process.env.API_HOST}/gl/ref?whs=${whs}&limit=${limit}&offer=${offer}&fddate=${fddate}&filterGlrefNo=${filterGlrefNo}`,
       requestOptions
     );
 
@@ -63,7 +64,7 @@ const AdjustmentPage = () => {
         fetchData();
       }
     }
-  }, [fddate]);
+  }, [fddate, filterGlrefNo]);
 
   useEffect(() => {
     let d = new Date();
@@ -183,15 +184,35 @@ const AdjustmentPage = () => {
         </div>
       </div>
       <div>
-        <div className="mb-4">
-          <Input
-            size="sm"
-            shadow={false}
-            status="default"
-            type="date"
-            value={fddate}
-            onChange={(e) => setFdDate(e.target.value)}
-          />
+        <div className="mb-4 flex justify-start space-x-4">
+          <div className="flex justify-start space-x-2">
+            <span className="mt-1 text-sm font-bold text-gray-600">
+              REC. DATE:
+            </span>
+            <Input
+              clearable
+              size="sm"
+              shadow={false}
+              status="default"
+              type="date"
+              value={fddate}
+              onChange={(e) => setFdDate(e.target.value)}
+            />
+          </div>
+          <div className="flex justify-start space-x-2">
+            <span className="mt-1 text-sm font-bold text-gray-600">
+              REF. No.:
+            </span>
+            <Input
+              clearable
+              size="sm"
+              shadow={false}
+              status="default"
+              value={filterGlrefNo}
+              placeholder="REF.NO"
+              onChange={(e) => setFilterGlrefNo(e.target.value)}
+            />
+          </div>
         </div>
         <Table
           shadow={false}
@@ -246,39 +267,16 @@ const AdjustmentPage = () => {
                     ? `${i.to?.fccode}-${i.to?.fcname}`
                     : ""}
                 </Table.Cell>
-                <Table.Cell>{i.fmmemdata}</Table.Cell>
+                <Table.Cell>
+                  <Tooltip content={i.fmmemdata}>
+                    {i.fmmemdata.length > 50
+                      ? `${i.fmmemdata.substring(0, 40)}.....`
+                      : i.fmmemdata}
+                  </Tooltip>
+                </Table.Cell>
                 <Table.Cell>
                   <Button auto light size={"xs"}>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth={1.5}
-                      stroke="currentColor"
-                      className="w-6 h-6 text-rose-500"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                    {/* {i.fcbook.length > 0 && i.fnamt > 0 ? (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth={1.5}
-                        stroke="currentColor"
-                        className="w-6 h-6 text-green-600"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                      </svg>
-                    ) : (
+                    {i.fnamt > 0 ? (
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
@@ -293,7 +291,22 @@ const AdjustmentPage = () => {
                           d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                         />
                       </svg>
-                    )} */}
+                    ) : (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        stroke="currentColor"
+                        className="w-6 h-6 text-green-600"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                    )}
                   </Button>
                 </Table.Cell>
                 <Table.Cell>{DateTime(i.ftlastupd)}</Table.Cell>
