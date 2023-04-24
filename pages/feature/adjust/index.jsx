@@ -15,12 +15,13 @@ const AdjustmentPage = () => {
   const [whs, setWhs] = useState("VCST");
   const [limit, setLimit] = useState(100);
   const [offer, setOffer] = useState(1);
-  const [fcrftype, setFcrfType] = useState("A");
+  const [fcrftype, setFcrfType] = useState("G");
   const [fddate, setFdDate] = useState("");
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const fetchData = async () => {
     setReloading(true);
+    setGlRefData([]);
     var myHeaders = new Headers();
     myHeaders.append("Authorization", session?.user.accessToken);
 
@@ -30,8 +31,14 @@ const AdjustmentPage = () => {
       redirect: "follow",
     };
 
+    // console.log(
+    //   `${process.env.API_HOST}/gl/ref?whs=${whs}&limit=${limit}&offer=${offer}&fcrftype=${fcrftype}&fddate=${fddate}`
+    // );
+    console.log(
+      `${process.env.API_HOST}/gl/ref?whs=${whs}&limit=${limit}&offer=${offer}&fddate=${fddate}`
+    );
     const res = await fetch(
-      `${process.env.API_HOST}/gl/ref?whs=${whs}&limit=${limit}&offer=${offer}&fcrftype=${fcrftype}&fddate=${fddate}`,
+      `${process.env.API_HOST}/gl/ref?whs=${whs}&limit=${limit}&offer=${offer}&fddate=${fddate}`,
       requestOptions
     );
 
@@ -44,6 +51,7 @@ const AdjustmentPage = () => {
     }
 
     if (!res.ok) {
+      console.dir(res.statusText);
       setReloading(false);
       return;
     }
@@ -51,7 +59,9 @@ const AdjustmentPage = () => {
 
   useEffect(() => {
     if (session?.user) {
-      fetchData();
+      if (fddate.length > 0) {
+        fetchData();
+      }
     }
   }, [fddate]);
 

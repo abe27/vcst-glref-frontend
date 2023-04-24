@@ -158,7 +158,7 @@ const MainLayout = ({
                     description="จัดการข้อมูลการรับสินค้าเข้าคลัง"
                     icon={icons.edit}
                   >
-                    Receive MRRP
+                    Receive
                   </Dropdown.Item>
                   <Dropdown.Item
                     key="usage_metrics"

@@ -43,6 +43,13 @@ const DateTime = (dte) => {
   )}:${("0" + d.getSeconds()).slice(-2)}`;
 };
 
+const DateTimePostman = (dte) => {
+  let d = new Date(dte);
+  return `${d.getFullYear()}-${("0" + (d.getMonth() + 1)).slice(-2)}-${(
+    "0" + d.getDate()
+  ).slice(-2)}T00:00:00.000Z`;
+};
+
 const DateTimeEdi = () => {
   let d = faker.date.between(
     "2022-12-01T00:00:00.000Z",
@@ -340,4 +347,5 @@ export {
   PostHeader,
   UploadHeader,
   TrimeSpace,
+  DateTimePostman,
 };
