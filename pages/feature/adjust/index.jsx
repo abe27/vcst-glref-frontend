@@ -35,9 +35,9 @@ const AdjustmentPage = () => {
     // console.log(
     //   `${process.env.API_HOST}/gl/ref?whs=${whs}&limit=${limit}&offer=${offer}&fcrftype=${fcrftype}&fddate=${fddate}`
     // );
-    console.log(
-      `${process.env.API_HOST}/gl/ref?whs=${session?.user.whs.name}&limit=${limit}&offer=${offer}&fddate=${fddate}&filterGlrefNo=${filterGlrefNo}`
-    );
+    // console.log(
+    //   `${process.env.API_HOST}/gl/ref?whs=${session?.user.whs.name}&limit=${limit}&offer=${offer}&fddate=${fddate}&filterGlrefNo=${filterGlrefNo}`
+    // );
     const res = await fetch(
       `${process.env.API_HOST}/gl/ref?whs=${session?.user.whs.name}&limit=${limit}&offer=${offer}&fddate=${fddate}&filterGlrefNo=${filterGlrefNo}`,
       requestOptions
