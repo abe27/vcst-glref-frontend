@@ -13,6 +13,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { icons } from "./elements/Icons";
+import Link from "next/link";
 
 const Box = styled("div", {
   boxSizing: "border-box",
@@ -109,9 +110,11 @@ const MainLayout = ({
           <Navbar shouldHideOnScroll isBordered={isDark} variant="sticky">
             <Navbar.Brand>
               <AcmeLogo />
-              <Text b color="inherit" hideIn="xs">
-                {process.env.APP_NAME}
-              </Text>
+              <Link href="/">
+                <Text b color="inherit" hideIn="xs">
+                  {process.env.APP_NAME}
+                </Text>
+              </Link>
             </Navbar.Brand>
             <Navbar.Content hideIn="xs" variant="underline">
               <Navbar.Link href="/">Home</Navbar.Link>
