@@ -45,8 +45,9 @@ const AdjustmentPage = () => {
 
     if (res.ok) {
       const data = await res.json();
-      console.dir(data.data);
-      setGlRefData(data.data);
+      if (data.data) {
+        setGlRefData(data.data);
+      }
       setReloading(false);
       return;
     }
@@ -101,7 +102,10 @@ const AdjustmentPage = () => {
               </span>
               <span>
                 Activity(
-                <span className="text-blue-500">{glRefData.length}</span>)
+                <span className="text-blue-500">
+                  {glRefData ? glRefData.length : "0"}
+                </span>
+                )
               </span>
             </li>
             <li className="flex items-center mr-3 mt-3 md:mt-0">
@@ -237,81 +241,84 @@ const AdjustmentPage = () => {
             <Table.Column></Table.Column>
           </Table.Header>
           <Table.Body>
-            {glRefData.map((i, x) => (
-              <Table.Row key={x}>
-                <Table.Cell>{x + 1}</Table.Cell>
-                <Table.Cell>{DateOnly(i.fddate)}</Table.Cell>
-                <Table.Cell>{i.book.fcname}</Table.Cell>
-                <Table.Cell>
-                  <span className="text-indigo-400">{i.fccode}</span>
-                </Table.Cell>
-                <Table.Cell>
-                  <Link href={`/feature/adjust/detail?id=${i.fcskid}`}>
-                    <span className="hover:text-indigo-600">{i.fcrefno}</span>
-                  </Link>
-                </Table.Cell>
-                <Table.Cell>
-                  <span
-                    className={i.fnamt > 0 ? `text-blue-600` : "text-rose-600"}
-                  >
-                    {i.fnamt.toLocaleString()}
-                  </span>
-                </Table.Cell>
-                <Table.Cell>
-                  {i.from?.fccode !== undefined
-                    ? `${i.from?.fccode}-${i.from?.fcname}`
-                    : ``}
-                </Table.Cell>
-                <Table.Cell>
-                  {i.to?.fccode !== undefined
-                    ? `${i.to?.fccode}-${i.to?.fcname}`
-                    : ""}
-                </Table.Cell>
-                <Table.Cell>
-                  <Tooltip content={i.fmmemdata}>
-                    {i.fmmemdata.length > 50
-                      ? `${i.fmmemdata.substring(0, 40)}.....`
-                      : i.fmmemdata}
-                  </Tooltip>
-                </Table.Cell>
-                <Table.Cell>
-                  <Button auto light size={"xs"}>
-                    {i.fcstatus ? (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth={1.5}
-                        stroke="currentColor"
-                        className="w-6 h-6 text-green-600"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                      </svg>
-                    ) : (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth={1.5}
-                        stroke="currentColor"
-                        className="w-6 h-6 text-rose-500"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                      </svg>
-                    )}
-                  </Button>
-                </Table.Cell>
-                <Table.Cell>{DateTime(i.ftlastupd)}</Table.Cell>
-              </Table.Row>
-            ))}
+            {glRefData &&
+              glRefData.map((i, x) => (
+                <Table.Row key={x}>
+                  <Table.Cell>{x + 1}</Table.Cell>
+                  <Table.Cell>{DateOnly(i.fddate)}</Table.Cell>
+                  <Table.Cell>{i.book.fcname}</Table.Cell>
+                  <Table.Cell>
+                    <span className="text-indigo-400">{i.fccode}</span>
+                  </Table.Cell>
+                  <Table.Cell>
+                    <Link href={`/feature/adjust/detail?id=${i.fcskid}`}>
+                      <span className="hover:text-indigo-600">{i.fcrefno}</span>
+                    </Link>
+                  </Table.Cell>
+                  <Table.Cell>
+                    <span
+                      className={
+                        i.fnamt > 0 ? `text-blue-600` : "text-rose-600"
+                      }
+                    >
+                      {i.fnamt.toLocaleString()}
+                    </span>
+                  </Table.Cell>
+                  <Table.Cell>
+                    {i.from?.fccode !== undefined
+                      ? `${i.from?.fccode}-${i.from?.fcname}`
+                      : ``}
+                  </Table.Cell>
+                  <Table.Cell>
+                    {i.to?.fccode !== undefined
+                      ? `${i.to?.fccode}-${i.to?.fcname}`
+                      : ""}
+                  </Table.Cell>
+                  <Table.Cell>
+                    <Tooltip content={i.fmmemdata}>
+                      {i.fmmemdata.length > 50
+                        ? `${i.fmmemdata.substring(0, 40)}.....`
+                        : i.fmmemdata}
+                    </Tooltip>
+                  </Table.Cell>
+                  <Table.Cell>
+                    <Button auto light size={"xs"}>
+                      {i.fcstatus ? (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="currentColor"
+                          className="w-6 h-6 text-green-600"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                      ) : (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="currentColor"
+                          className="w-6 h-6 text-rose-500"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                      )}
+                    </Button>
+                  </Table.Cell>
+                  <Table.Cell>{DateTime(i.ftlastupd)}</Table.Cell>
+                </Table.Row>
+              ))}
           </Table.Body>
           {glRefData ? (
             <Table.Pagination
