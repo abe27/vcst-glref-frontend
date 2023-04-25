@@ -188,7 +188,7 @@ const AddNewAdjustPage = () => {
     };
 
     const res = await fetch(
-      `${process.env.API_HOST}/gl/ref?whs=VCST`,
+      `${process.env.API_HOST}/gl/ref?whs=${session?.user.whs.name}`,
       requestOptions
     );
 

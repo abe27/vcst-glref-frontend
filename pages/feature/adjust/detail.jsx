@@ -49,25 +49,80 @@ const FeatureAdjustDetailPage = () => {
     return q.toLocaleString();
   };
 
-  const handleSuccess = () => {
-    Swal.fire({
-      text: `Save data is successfully.`,
-      icon: "success",
-      confirmButtonText: "OK",
-      confirmButtonColor: "#19B5FE",
-      preConfirm: () => router.back(),
+  const handleSuccess = async (invNo) => {
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    myHeaders.append("Authorization", session?.user.accessToken);
+    var raw = JSON.stringify({
+      fcrefno: invNo,
     });
+
+    var requestOptions = {
+      method: "PUT",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow",
+    };
+
+    const res = await fetch(
+      `${process.env.API_HOST}/gl/transfer/${router.query.id}?whs=${session?.user.whs.name}`,
+      requestOptions
+    );
+
+    if (res.ok) {
+      // const data = await res.json();
+      MySwal.fire({
+        text: `Save data is successfully.`,
+        icon: "success",
+        confirmButtonText: "OK",
+        confirmButtonColor: "#19B5FE",
+        preConfirm: () => router.reload(),
+      });
+    }
+
+    if (!res.ok) {
+      const data = await res.json();
+      MySwal.fire({
+        text: data.message,
+        icon: "error",
+        confirmButtonText: "OK",
+        confirmButtonColor: "#CF3A24",
+        preConfirm: () => fetchData(router.query.id),
+      });
+    }
+  };
+
+  const handlerInputInvoice = async () => {
+    const { value: invoiceNo } = await MySwal.fire({
+      title: "Please enter Invoice No.?",
+      input: "text",
+      inputPlaceholder: "Enter Invoice No",
+      // showCancelButton: true,
+    });
+
+    if (invoiceNo) {
+      MySwal.fire({
+        text: `Would you like transfer data to ${invoiceNo.toUpperCase()}?`,
+        icon: "warning",
+        showCancelButton: true,
+        cancelButtonText: "Cancel",
+        confirmButtonText: "OK",
+        confirmButtonColor: "#19B5FE",
+        cancelButtonColor: "#CF3A24",
+        preConfirm: () => handleSuccess(invoiceNo.toUpperCase()),
+      });
+    }
   };
 
   const isConfirm = () => {
-    Swal.fire({
+    MySwal.fire({
       text: `Would you like to confirm received data?`,
       icon: "warning",
       showCancelButton: true,
       cancelButtonText: "Cancel",
       confirmButtonText: "OK",
       confirmButtonColor: "#19B5FE",
-      preConfirm: () => handleSuccess(),
+      preConfirm: () => handlerInputInvoice(),
     });
   };
 
@@ -79,7 +134,7 @@ const FeatureAdjustDetailPage = () => {
   }, [router]);
   return (
     <MainLayout>
-      {refData.length <= 0 ? (
+      {refData <= 0 ? (
         <SkeletonLoading />
       ) : (
         <>
@@ -104,6 +159,18 @@ const FeatureAdjustDetailPage = () => {
                       REC. DATE:{" "}
                       <span className="text-blue-500">
                         {DateOnly(refData[0].glref.fddate)}
+                      </span>
+                    </h4>
+                    <h4 className="text-sm font-bold leading-tight flex space-x-4">
+                      <div>REC. STATUS:</div>
+                      <span
+                        className={
+                          refData[0].glref.fcstatus
+                            ? `text-blue-500`
+                            : `text-rose-500`
+                        }
+                      >
+                        {refData[0].glref.fcstatus ? `Completed` : `In Process`}
                       </span>
                     </h4>
                   </div>
@@ -153,15 +220,19 @@ const FeatureAdjustDetailPage = () => {
               >
                 Back
               </Button>
-              <Button
-                auto
-                color={`primary`}
-                size={`sm`}
-                ripple
-                onPress={isConfirm}
-              >
-                Confirm Received
-              </Button>
+              {!refData[0].glref.fcstatus ? (
+                <Button
+                  auto
+                  color={`primary`}
+                  size={`sm`}
+                  ripple
+                  onPress={isConfirm}
+                >
+                  Confirm Received
+                </Button>
+              ) : (
+                <></>
+              )}
             </div>
           </div>
           <div className="mt-4 pl-8 pr-8">
