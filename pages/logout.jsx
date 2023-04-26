@@ -1,15 +1,16 @@
 import { signOut } from "next-auth/react";
 import Head from "next/head";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
 const LogOutPage = () => {
-  // const router = useRouter();
+  const router = useRouter();
   const [countDown, setCountDown] = useState(5);
 
   useEffect(() => {
     if (countDown <= 0) {
       signOut({
-        callbackUrl: `${window.location.origin}`,
+        callbackUrl: `${router.push("/auth")}`,
       });
       // router.push("/login");
     }
@@ -45,7 +46,7 @@ const LogOutPage = () => {
               role={"button"}
               onClick={() =>
                 signOut({
-                  callbackUrl: `${window.location.origin}`,
+                  callbackUrl: `${router.push("/auth")}`,
                 })
               }
             >

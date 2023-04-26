@@ -321,6 +321,10 @@ const TrimeSpace = (x) => {
   return null;
 };
 
+const SubDateTime = (x) => {
+  return `${x.substring(0, 10)} ${x.substring(11, 19)}`;
+};
+
 export {
   DateTime,
   DateOnly,
@@ -348,4 +352,5 @@ export {
   UploadHeader,
   TrimeSpace,
   DateTimePostman,
+  SubDateTime,
 };

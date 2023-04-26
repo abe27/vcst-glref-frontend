@@ -1,5 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @next/next/no-img-element */
+import { Noto_Sans_Thai } from "next/font/google";
+
+const fonts = Noto_Sans_Thai({ weight: "400", subsets: ["latin"] });
 import {
   Avatar,
   Dropdown,
@@ -78,9 +81,10 @@ const MainLayout = ({
 
   const handleUserMenu = (actionKey) => {
     console.log(actionKey.actionKey);
-    if (actionKey.actionKey === "logout") {
-      router.push("/logout");
-    }
+    router.push(`/${actionKey.actionKey}`);
+    // if (actionKey.actionKey === "logout") {
+    //   router.push("/logout");
+    // }
   };
 
   const handleFeatureMenu = (actionKey) => {
@@ -94,7 +98,7 @@ const MainLayout = ({
     }
   }, [session]);
   return (
-    <>
+    <div className={fonts.className}>
       <Head>
         <title>{title}</title>
         <meta name="description" content={description} />
@@ -230,20 +234,18 @@ const MainLayout = ({
                       {session?.user.email}
                     </Text>
                   </Dropdown.Item>
-                  <Dropdown.Item key="settings" withDivider>
-                    My Settings
+                  <Dropdown.Item key="profile" withDivider>
+                    My Profile
                   </Dropdown.Item>
-                  <Dropdown.Item key="team_settings">
-                    Team Settings
-                  </Dropdown.Item>
-                  <Dropdown.Item key="analytics" withDivider>
+                  <Dropdown.Item key="system">System Settings</Dropdown.Item>
+                  {/* <Dropdown.Item key="analytics" withDivider>
                     Analytics
-                  </Dropdown.Item>
-                  <Dropdown.Item key="system">System</Dropdown.Item>
+                  </Dropdown.Item> */}
+                  {/* <Dropdown.Item key="system">System</Dropdown.Item>
                   <Dropdown.Item key="configurations">
                     Configurations
-                  </Dropdown.Item>
-                  <Dropdown.Item key="help_and_feedback" withDivider>
+                  </Dropdown.Item> */}
+                  <Dropdown.Item key="help" withDivider>
                     Help & Feedback
                   </Dropdown.Item>
                   <Dropdown.Item key="logout" withDivider color="error">
@@ -256,7 +258,7 @@ const MainLayout = ({
           <div className="pl-14 pr-14 my-6 pb-4 ">{children}</div>
         </Box>
       </div>
-    </>
+    </div>
   );
 };
 

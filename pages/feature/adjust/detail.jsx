@@ -76,7 +76,7 @@ const FeatureAdjustDetailPage = () => {
         icon: "success",
         confirmButtonText: "OK",
         confirmButtonColor: "#19B5FE",
-        preConfirm: () => router.reload(),
+        preConfirm: () => fetchData(router.query.id),
       });
     }
 

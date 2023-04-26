@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { DateOnly, DateString, DateTime } from "@/hooks";
+import { DateOnly, DateString, DateTime, SubDateTime } from "@/hooks";
 import { Button, Input, Loading, Table, Tooltip } from "@nextui-org/react";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
@@ -246,7 +246,15 @@ const AdjustmentPage = () => {
                 <Table.Row key={x}>
                   <Table.Cell>{x + 1}</Table.Cell>
                   <Table.Cell>{DateOnly(i.fddate)}</Table.Cell>
-                  <Table.Cell>{i.book.fcname}</Table.Cell>
+                  <Table.Cell>
+                    {
+                      <Tooltip content={i.book.fcname}>
+                        {i.book.fcname.length > 20
+                          ? `${i.book.fcname.substring(0, 20)}.....`
+                          : i.book.fcname}
+                      </Tooltip>
+                    }
+                  </Table.Cell>
                   <Table.Cell>
                     <span className="text-indigo-400">{i.fccode}</span>
                   </Table.Cell>
@@ -277,7 +285,7 @@ const AdjustmentPage = () => {
                   <Table.Cell>
                     <Tooltip content={i.fmmemdata}>
                       {i.fmmemdata.length > 50
-                        ? `${i.fmmemdata.substring(0, 40)}.....`
+                        ? `${i.fmmemdata.substring(0, 20)}.....`
                         : i.fmmemdata}
                     </Tooltip>
                   </Table.Cell>
@@ -316,7 +324,7 @@ const AdjustmentPage = () => {
                       )}
                     </Button>
                   </Table.Cell>
-                  <Table.Cell>{DateTime(i.ftlastupd)}</Table.Cell>
+                  <Table.Cell>{SubDateTime(i.ftlastupd)}</Table.Cell>
                 </Table.Row>
               ))}
           </Table.Body>
