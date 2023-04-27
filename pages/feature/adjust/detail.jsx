@@ -15,6 +15,7 @@ const FeatureAdjustDetailPage = () => {
   const { data: session } = useSession();
   const router = useRouter();
   const [refData, setRefData] = useState([]);
+  const [orderHeader, setOrderHeader] = useState([]);
   // const [whs, setWhs] = useState("");
   const [limit, setLimit] = useState(100);
   const [offer, setOffer] = useState(1);
@@ -92,6 +93,37 @@ const FeatureAdjustDetailPage = () => {
     }
   };
 
+  const filterPo = async (invoiceNo) => {
+    setOrderHeader([]);
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", session?.user.accessToken);
+
+    var requestOptions = {
+      method: "GET",
+      headers: myHeaders,
+      redirect: "follow",
+    };
+
+    // const res = await fetch(
+    //   `${process.env.API_HOST}/order/head?book=${refData[0].glref.fcbook}&whs=${session?.user.whs.name}&limit=1&offer=1&filterOrderNo=${invoiceNo}&fcreftype=PO`,
+    //   requestOptions
+    // );
+
+    const res = await fetch(
+      `${process.env.API_HOST}/order/head?whs=${session?.user.whs.name}&limit=1&offer=1&filterOrderNo=${invoiceNo}&fcreftype=PO&fcstep=P`,
+      requestOptions
+    );
+
+    if (res.ok) {
+      const data = await res.json();
+      return data.data;
+    }
+
+    if (!res.ok) {
+      return false;
+    }
+  };
+
   const handlerInputInvoice = async () => {
     const { value: invoiceNo } = await MySwal.fire({
       title: "Please enter Invoice No.?",
@@ -101,16 +133,21 @@ const FeatureAdjustDetailPage = () => {
     });
 
     if (invoiceNo) {
-      MySwal.fire({
-        text: `Would you like transfer data to ${invoiceNo.toUpperCase()}?`,
-        icon: "warning",
-        showCancelButton: true,
-        cancelButtonText: "Cancel",
-        confirmButtonText: "OK",
-        confirmButtonColor: "#19B5FE",
-        cancelButtonColor: "#CF3A24",
-        preConfirm: () => handleSuccess(invoiceNo.toUpperCase()),
-      });
+      const invData = await filterPo(invoiceNo);
+      if (invData.length > 0) {
+        console.dir(invData);
+      }
+      setOrderHeader(invData);
+      // MySwal.fire({
+      //   text: `Would you like transfer data to ${invoiceNo.toUpperCase()}?`,
+      //   icon: "warning",
+      //   showCancelButton: true,
+      //   cancelButtonText: "Cancel",
+      //   confirmButtonText: "OK",
+      //   confirmButtonColor: "#19B5FE",
+      //   cancelButtonColor: "#CF3A24",
+      //   preConfirm: () => handleSuccess(invoiceNo.toUpperCase()),
+      // });
     }
   };
 
@@ -191,7 +228,7 @@ const FeatureAdjustDetailPage = () => {
                         {DateOnly(refData[0].glref.fddate)}
                       </span>
                     </h4>
-                    {/* <h4 className="text-sm font-bold leading-tight flex space-x-4">
+                    <h4 className="text-sm font-bold leading-tight flex space-x-4">
                       <div>REC. STATUS:</div>
                       <span
                         className={
@@ -202,7 +239,7 @@ const FeatureAdjustDetailPage = () => {
                       >
                         {refData[0].glref.fcstatus ? `Completed` : `In Process`}
                       </span>
-                    </h4> */}
+                    </h4>
                   </div>
                   <div className="flex justify-start space-x-4">
                     <h4 className="text-sm font-bold leading-tight text-gray-800">
@@ -250,7 +287,7 @@ const FeatureAdjustDetailPage = () => {
               >
                 Back
               </Button>
-              {/* {!refData[0].glref.fcstatus ? (
+              {!refData[0].glref.fcstatus ? (
                 <Button
                   auto
                   color={`primary`}
@@ -262,7 +299,7 @@ const FeatureAdjustDetailPage = () => {
                 </Button>
               ) : (
                 <></>
-              )} */}
+              )}
             </div>
           </div>
           <div className="mt-4 pl-8 pr-8">
