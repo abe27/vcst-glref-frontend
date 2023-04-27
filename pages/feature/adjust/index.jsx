@@ -178,7 +178,7 @@ const AdjustmentPage = () => {
           )}
           <Button
             auto
-            color={`warning`}
+            color={`error`}
             size={`sm`}
             ripple
             onPress={() => router.push("/feature/adjust/add")}
@@ -237,7 +237,7 @@ const AdjustmentPage = () => {
             <Table.Column>FROM</Table.Column>
             <Table.Column>TO</Table.Column>
             <Table.Column>REMARK</Table.Column>
-            <Table.Column>STATUS.</Table.Column>
+            {/* <Table.Column>STATUS.</Table.Column> */}
             <Table.Column></Table.Column>
           </Table.Header>
           <Table.Body>
@@ -250,7 +250,10 @@ const AdjustmentPage = () => {
                     {
                       <Tooltip content={i.book.fcname}>
                         {i.book.fcname.length > 20
-                          ? `${i.book.fcname.substring(0, 20)}.....`
+                          ? `${i.book.fccode}-${i.book.fcname.substring(
+                              0,
+                              5
+                            )}.....`
                           : i.book.fcname}
                       </Tooltip>
                     }
@@ -289,7 +292,7 @@ const AdjustmentPage = () => {
                         : i.fmmemdata}
                     </Tooltip>
                   </Table.Cell>
-                  <Table.Cell>
+                  {/* <Table.Cell>
                     <Button auto light size={"xs"}>
                       {i.fcstatus ? (
                         <svg
@@ -323,7 +326,7 @@ const AdjustmentPage = () => {
                         </svg>
                       )}
                     </Button>
-                  </Table.Cell>
+                  </Table.Cell> */}
                   <Table.Cell>{SubDateTime(i.ftlastupd)}</Table.Cell>
                 </Table.Row>
               ))}

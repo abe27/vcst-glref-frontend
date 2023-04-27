@@ -23,10 +23,22 @@ const DrawerAddNewItem = ({ token, handleAddNew = {} }) => {
   const [listProd, setListProd] = useState([]);
 
   const AddNewItem = (qty) => {
-    console.dir("confirm-add-new");
+    const q = parseFloat(qty);
+    if (q <= 0) {
+      toast({
+        title: "Message Warning!",
+        description: "Please enter qty!",
+        status: "error",
+        duration: 3500,
+        isClosable: true,
+        position: "top",
+      });
+      return;
+    }
+
     if (checked.length > 0) {
       const prod = listProd.filter((i) => i.fcskid === checked);
-      prod.qty = parseInt(qty);
+      prod.qty = parseFloat(qty);
       handleAddNew(prod);
       onClose();
       return;

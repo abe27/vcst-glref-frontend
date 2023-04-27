@@ -82,9 +82,6 @@ const MainLayout = ({
   const handleUserMenu = (actionKey) => {
     console.log(actionKey.actionKey);
     router.push(`/${actionKey.actionKey}`);
-    // if (actionKey.actionKey === "logout") {
-    //   router.push("/logout");
-    // }
   };
 
   const handleFeatureMenu = (actionKey) => {
@@ -165,9 +162,9 @@ const MainLayout = ({
                     description="จัดการข้อมูลการรับสินค้าเข้าคลัง"
                     icon={icons.edit}
                   >
-                    Receive
+                    Receive Adjustment
                   </Dropdown.Item>
-                  <Dropdown.Item
+                  {/* <Dropdown.Item
                     key="usage_metrics"
                     showFullDescription
                     description="Real-time metrics to debug issues. Slow query added? We’ll show you exactly where."
@@ -198,7 +195,7 @@ const MainLayout = ({
                     icon={icons.user}
                   >
                     +Supreme Support
-                  </Dropdown.Item>
+                  </Dropdown.Item> */}
                 </Dropdown.Menu>
               </Dropdown>
             </Navbar.Content>
@@ -217,7 +214,7 @@ const MainLayout = ({
                       bordered
                       as="button"
                       size="md"
-                      src="https://i.pravatar.cc/150"
+                      src={`https://ui-avatars.com/api/?background=0D8ABC&color=fff&rounded=true&size=150&name=${session?.user.fullName}&bold=true`}
                     />
                   </Dropdown.Trigger>
                 </Navbar.Item>

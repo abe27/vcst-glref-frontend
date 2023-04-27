@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
 import MainLayout from "@/components/layout";
-import { Button, Table } from "@nextui-org/react";
+import { Button, Table, Tooltip } from "@nextui-org/react";
 import { DateOnly, DateTime } from "@/hooks";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import withReactContent from "sweetalert2-react-content";
@@ -126,6 +126,36 @@ const FeatureAdjustDetailPage = () => {
     });
   };
 
+  const handlerConfirmDeleteItem = (obj) => {
+    console.dir(obj);
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", session?.user.accessToken);
+
+    var requestOptions = {
+      method: "DELETE",
+      headers: myHeaders,
+      redirect: "follow",
+    };
+
+    fetch(
+      "http://127.0.0.1:4040/api/v1/gl/prod/xxxxx?whs=VCST",
+      requestOptions
+    );
+  };
+
+  const DeleteItem = (obj) => {
+    // console.dir(obj);
+    MySwal.fire({
+      text: `Would you like to confirm delete ${obj.prod.fccode}?`,
+      icon: "warning",
+      showCancelButton: true,
+      cancelButtonText: "Cancel",
+      confirmButtonText: "OK",
+      confirmButtonColor: "#19B5FE",
+      preConfirm: () => handlerConfirmDeleteItem(obj),
+    });
+  };
+
   useEffect(() => {
     if (session?.user) {
       setRefData([]);
@@ -161,7 +191,7 @@ const FeatureAdjustDetailPage = () => {
                         {DateOnly(refData[0].glref.fddate)}
                       </span>
                     </h4>
-                    <h4 className="text-sm font-bold leading-tight flex space-x-4">
+                    {/* <h4 className="text-sm font-bold leading-tight flex space-x-4">
                       <div>REC. STATUS:</div>
                       <span
                         className={
@@ -172,7 +202,7 @@ const FeatureAdjustDetailPage = () => {
                       >
                         {refData[0].glref.fcstatus ? `Completed` : `In Process`}
                       </span>
-                    </h4>
+                    </h4> */}
                   </div>
                   <div className="flex justify-start space-x-4">
                     <h4 className="text-sm font-bold leading-tight text-gray-800">
@@ -220,7 +250,7 @@ const FeatureAdjustDetailPage = () => {
               >
                 Back
               </Button>
-              {!refData[0].glref.fcstatus ? (
+              {/* {!refData[0].glref.fcstatus ? (
                 <Button
                   auto
                   color={`primary`}
@@ -228,11 +258,11 @@ const FeatureAdjustDetailPage = () => {
                   ripple
                   onPress={isConfirm}
                 >
-                  Confirm Received
+                  Confirm Invoice
                 </Button>
               ) : (
                 <></>
-              )}
+              )} */}
             </div>
           </div>
           <div className="mt-4 pl-8 pr-8">
@@ -251,7 +281,7 @@ const FeatureAdjustDetailPage = () => {
                 <Table.Column>FCNAME</Table.Column>
                 <Table.Column>QTY</Table.Column>
                 <Table.Column>UNIT</Table.Column>
-                <Table.Column>Staus</Table.Column>
+                {/* <Table.Column>Staus</Table.Column> */}
                 <Table.Column></Table.Column>
               </Table.Header>
               <Table.Body>
@@ -262,8 +292,52 @@ const FeatureAdjustDetailPage = () => {
                     <Table.Cell>{i.prod.fcname}</Table.Cell>
                     <Table.Cell>{i?.fnqty.toLocaleString()}</Table.Cell>
                     <Table.Cell>{i.unit.fcname}</Table.Cell>
-                    <Table.Cell></Table.Cell>
-                    <Table.Cell>{DateTime(i.ftlastupd)}</Table.Cell>
+                    {/* <Table.Cell></Table.Cell> */}
+                    <Table.Cell>
+                      <div className="flex justify-start space-x-4">
+                        <div>{DateTime(i.ftlastupd)}</div>
+                        {/* {i.glref.fcstatus ? (
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.5}
+                            stroke="currentColor"
+                            className="w-4 h-4 text-green-600"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                          </svg>
+                        ) : (
+                          <Button
+                            auto
+                            light
+                            size={"xs"}
+                            onPress={() => DeleteItem(i)}
+                          >
+                            <Tooltip content={`Delete ${i.prod.fccode}?`}>
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                strokeWidth={1.5}
+                                stroke="currentColor"
+                                className="w-4 h-4 text-rose-600"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                />
+                              </svg>
+                            </Tooltip>
+                          </Button>
+                        )} */}
+                      </div>
+                    </Table.Cell>
                   </Table.Row>
                 ))}
               </Table.Body>

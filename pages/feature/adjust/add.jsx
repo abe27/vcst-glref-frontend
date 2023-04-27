@@ -21,24 +21,95 @@ const AddNewAdjustPage = () => {
   const router = useRouter();
   const toast = useToast();
   const [selected, setSelected] = useState(new Set(["text"]));
+  const [selectedFromWhs, setSelectedFromWhs] = useState(new Set(["text"]));
+  const [selectedToWhs, setSelectedToWhs] = useState(new Set(["text"]));
   const [receiveType, setReceiveType] = useState([]);
   const [recBook, setRecBook] = useState({});
-  const [recWhs, setRecWhs] = useState({});
+  const [whsData, setWhsData] = useState([]);
+  const [recFromWhs, setRecFromWhs] = useState({});
+  const [recToWhs, setRecToWhs] = useState({});
   const [refData, setRefData] = useState([]);
   const [recQty, setRecQty] = useState(0);
   const [remark, setRemark] = useState("-");
   const [recDate, setRecDate] = useState(null);
+
+  // const selectedFromWhsValue = useMemo(() => {
+  //   // const id = Array.from(selectedFromWhs).join(", ").replaceAll("_", " ");
+  //   // const obj = whsData.filter((i) => i.fcskid === id);
+  //   // console.dir(obj);
+  //   // // if (obj.length > 0) {
+  //   // //   setRecBook(obj[0]);
+  //   // //   setRecFromWhs(obj[0].whouse);
+  //   // //   return `${obj[0].fccode}-${obj[0].fcname}`;
+  //   // // }
+  //   const whs = selectedFromWhs;
+  //   console.dir(whs);
+  //   return `${whs.fccode}`;
+  // }, [selectedFromWhs]);
+
+  const selectedToWhsValue = useMemo(() => {
+    const id = Array.from(selectedToWhs).join(", ").replaceAll("_", " ");
+    const obj = whsData.filter((i) => i.fcskid === id);
+    console.dir(obj);
+    if (obj.length > 0) {
+      setRecToWhs(obj[0]);
+      return `${obj[0].fccode}-${obj[0].fcname}`;
+    }
+    return "-";
+  }, [selectedToWhs]);
 
   const selectedValue = useMemo(() => {
     const id = Array.from(selected).join(", ").replaceAll("_", " ");
     const obj = receiveType.filter((i) => i.fcskid === id);
     if (obj.length > 0) {
       setRecBook(obj[0]);
-      setRecWhs(obj[0].whouse);
+      setRecToWhs(obj[0].whouse);
       return `${obj[0].fccode}-${obj[0].fcname}`;
     }
     return "-";
   }, [selected]);
+
+  const fetWhs = async () => {
+    setWhsData([]);
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", session?.user.accessToken);
+
+    var requestOptions = {
+      method: "GET",
+      headers: myHeaders,
+      redirect: "follow",
+    };
+
+    const res = await fetch(
+      `${process.env.API_HOST}/whouse?offset=1&limit=100&type=4&whs=${session?.user.whs.name}&limit=100&offer=1`,
+      requestOptions
+    );
+
+    if (!res.ok) {
+      toast({
+        title: "Message Error!",
+        description: res.statusText,
+        status: "error",
+        duration: 3500,
+        position: "top",
+        isClosable: true,
+      });
+      return;
+    }
+
+    if (res.ok) {
+      const data = await res.json();
+      setWhsData(data.data);
+      const slFromWhs = data.data.filter(
+        (i) => i.fccode.replaceAll(" ", "") === "YYY"
+      );
+      console.dir(slFromWhs[0]);
+      if (slFromWhs.length > 0) {
+        setRecFromWhs(slFromWhs[0]);
+      }
+      return;
+    }
+  };
 
   const fetchReceiveType = async () => {
     var myHeaders = new Headers();
@@ -51,7 +122,7 @@ const AddNewAdjustPage = () => {
     };
 
     const res = await fetch(
-      `${process.env.API_HOST}/book?fctype=FR&whs=VCST&limit=100&offer=1`,
+      `${process.env.API_HOST}/book?fctype=AJ&whs=${session?.user.whs.name}&limit=100&offer=1`,
       requestOptions
     );
 
@@ -138,6 +209,18 @@ const AddNewAdjustPage = () => {
       return;
     }
 
+    if (selectedToWhsValue === "-") {
+      toast({
+        title: "Message Error!",
+        description: "Please select to whs!",
+        status: "error",
+        duration: 3500,
+        position: "top",
+        isClosable: true,
+      });
+      return;
+    }
+
     if (refData.length <= 0) {
       toast({
         title: "Message Error!",
@@ -162,7 +245,8 @@ const AddNewAdjustPage = () => {
     let doc = {
       fcbook: recBook.fccode,
       fcbranch: "00000",
-      fcwhouse: recWhs.fccode,
+      fromwhouse: "YYY",
+      towhouse: recToWhs?.fccode,
       fcreftype: recBook.fcreftype,
       fcrftype: recBook.fcreftype.substring(0, 1),
       fcstep: "I",
@@ -171,7 +255,7 @@ const AddNewAdjustPage = () => {
       ref_prod: prod,
     };
 
-    // // console.dir(recBook);
+    // console.dir(recBook);
     // console.dir(doc);
 
     var myHeaders = new Headers();
@@ -227,11 +311,12 @@ const AddNewAdjustPage = () => {
   }, [refData]);
 
   useEffect(() => {
-    // console.dir(recWhs);
+    // console.dir(recToWhs);
     let dte = new Date();
     setRecDate(DateOnly(dte));
     if (session?.user) {
       fetchReceiveType();
+      fetWhs();
     }
   }, [session]);
 
@@ -239,7 +324,7 @@ const AddNewAdjustPage = () => {
     <MainLayout>
       <div className="lg:my-12 container px-6 mx-auto flex flex-col lg:flex-row items-start lg:items-center justify-between w-full">
         <div className="mt-0">
-          <div className="flex justify-start space-x-4">
+          <div className="flex flex-wrap justify-start space-x-4">
             <div className="flex w-80">
               <h4 className="mt-3 text-sm font-bold leading-tight text-gray-800">
                 REC. DATE:&nbsp;&nbsp;
@@ -271,26 +356,54 @@ const AddNewAdjustPage = () => {
                   >
                     {receiveType.map((i, x) => (
                       <Dropdown.Item key={i.fcskid} description={i.fcname}>
-                        {i.fccode}
+                        {`${i.fccode}`}
                       </Dropdown.Item>
                     ))}
                   </Dropdown.Menu>
                 </Dropdown>
               </Container>
             </div>
-            {/* <h4 className="mt-3 text-sm font-bold leading-tight text-gray-800">
-              FROM:&nbsp;&nbsp;
-              <span className="text-blue-600">{`${recWhs.fccode}-${recWhs.fcname}`}</span>
-            </h4> */}
-            <div className="flex w-80">
+            <div className="flex w-60">
               <h4 className="mt-3 text-sm font-bold leading-tight text-gray-800">
-                TO:&nbsp;&nbsp;
+                FROM:
               </h4>
-              <h4 className="mt-3 text-sm font-bold leading-tight text-blue-400">
-                {recWhs !== null && recWhs.fccode !== undefined
-                  ? `${recWhs.fccode}-${recWhs.fcname}`
-                  : "-"}
-              </h4>
+              <div className="mt-2">
+                <Button auto light size={"xs"} color={"primary"}>
+                  <h4 className="mt-3 text-sm leading-tight">
+                    {recFromWhs !== null && recFromWhs.fccode !== undefined
+                      ? `${recFromWhs.fccode}-${recFromWhs.fcname}`
+                      : "-"}
+                  </h4>
+                </Button>
+              </div>
+            </div>
+            <div className="flex w-60">
+              <Container gap={0} css={{ d: "flex", flexWrap: "nowrap" }}>
+                <div className="mt-3 text-sm font-bold leading-tight text-gray-800">
+                  TO:
+                </div>
+                <Dropdown>
+                  <Dropdown.Button color={"primary"} light>
+                    {selectedToWhsValue}
+                  </Dropdown.Button>
+                  <Dropdown.Menu
+                    aria-label="Static Actions"
+                    disallowEmptySelection
+                    selectionMode="single"
+                    selectedKeys={selectedToWhs}
+                    onSelectionChange={setSelectedToWhs}
+                  >
+                    {whsData.map((i, x) => (
+                      <Dropdown.Item
+                        key={i.fcskid.replaceAll(" ", "")}
+                        description={i.fcname}
+                      >
+                        {`${i.fccode.replaceAll(" ", "")}`}
+                      </Dropdown.Item>
+                    ))}
+                  </Dropdown.Menu>
+                </Dropdown>
+              </Container>
             </div>
           </div>
           <div className="mt-2 flex justify-start space-x-4">
