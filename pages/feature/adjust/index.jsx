@@ -39,7 +39,7 @@ const AdjustmentPage = () => {
     //   `${process.env.API_HOST}/gl/ref?whs=${session?.user.whs.name}&limit=${limit}&offer=${offer}&fddate=${fddate}&filterGlrefNo=${filterGlrefNo}`
     // );
     const res = await fetch(
-      `${process.env.API_HOST}/gl/ref?whs=${session?.user.whs.name}&limit=${limit}&offer=${offer}&fddate=${fddate}&filterGlrefNo=${filterGlrefNo}`,
+      `${process.env.API_HOST}/gl/ref?whs=${session?.user.whs.name}&limit=${limit}&offer=${offer}&fddate=${fddate}&filterGlrefNo=${filterGlrefNo}&fcrftype=AJ`,
       requestOptions
     );
 
