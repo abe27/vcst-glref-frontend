@@ -12,10 +12,8 @@ const AdjustmentPage = () => {
   const { data: session } = useSession();
   const [reloading, setReloading] = useState(false);
   const [glRefData, setGlRefData] = useState([]);
-  const [whs, setWhs] = useState("VCST");
   const [limit, setLimit] = useState(100);
   const [offer, setOffer] = useState(1);
-  const [fcrftype, setFcrfType] = useState("G");
   const [filterGlrefNo, setFilterGlrefNo] = useState("");
   const [fddate, setFdDate] = useState("");
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -32,14 +30,8 @@ const AdjustmentPage = () => {
       redirect: "follow",
     };
 
-    // console.log(
-    //   `${process.env.API_HOST}/gl/ref?whs=${whs}&limit=${limit}&offer=${offer}&fcrftype=${fcrftype}&fddate=${fddate}`
-    // );
-    // console.log(
-    //   `${process.env.API_HOST}/gl/ref?whs=${session?.user.whs.name}&limit=${limit}&offer=${offer}&fddate=${fddate}&filterGlrefNo=${filterGlrefNo}`
-    // );
     const res = await fetch(
-      `${process.env.API_HOST}/gl/ref?whs=${session?.user.whs.name}&limit=${limit}&offer=${offer}&fddate=${fddate}&filterGlrefNo=${filterGlrefNo}&fcrftype=AJ`,
+      `${process.env.API_HOST}/gl/ref?whs=${session?.user.whs.name}&limit=${limit}&offer=${offer}&fddate=${fddate}&filterGlrefNo=${filterGlrefNo}&fcreftype=AJ`,
       requestOptions
     );
 
@@ -259,12 +251,13 @@ const AdjustmentPage = () => {
           <Table.Header>
             <Table.Column>#</Table.Column>
             <Table.Column>Date</Table.Column>
+            {/* <Table.Column>I/O</Table.Column> */}
             <Table.Column>BOOK</Table.Column>
             <Table.Column>FCCODE.</Table.Column>
             <Table.Column>REFNO.</Table.Column>
             <Table.Column>QTY.</Table.Column>
-            <Table.Column>FROM</Table.Column>
-            <Table.Column>TO</Table.Column>
+            <Table.Column>Out</Table.Column>
+            <Table.Column>In</Table.Column>
             <Table.Column>REMARK</Table.Column>
             <Table.Column>STATUS.</Table.Column>
             <Table.Column></Table.Column>
@@ -275,6 +268,7 @@ const AdjustmentPage = () => {
                 <Table.Row key={x}>
                   <Table.Cell>{x + 1}</Table.Cell>
                   <Table.Cell>{DateOnly(i.fddate)}</Table.Cell>
+                  {/* <Table.Cell>{i.fcstep === "I" ? "In" : "Out"}</Table.Cell> */}
                   <Table.Cell>
                     {
                       <Tooltip content={i.book.fcname}>

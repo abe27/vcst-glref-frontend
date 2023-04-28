@@ -2,19 +2,21 @@
 import {
   Drawer,
   DrawerBody,
+  DrawerCloseButton,
+  DrawerContent,
   DrawerFooter,
   DrawerHeader,
   DrawerOverlay,
-  DrawerContent,
-  DrawerCloseButton,
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
-import { Button, Input, Radio } from "@nextui-org/react";
-import { useState, useRef, useEffect } from "react";
+import { Button, Radio } from "@nextui-org/react";
+import { useSession } from "next-auth/react";
+import { useEffect, useRef, useState } from "react";
 import EnterQty from "./EnterQty";
 
 const DrawerAddNewItem = ({ token, handleAddNew = {} }) => {
+  const { data: session } = useSession();
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const btnRef = useRef();
@@ -66,7 +68,7 @@ const DrawerAddNewItem = ({ token, handleAddNew = {} }) => {
 
     // 1,2,5
     const res = await fetch(
-      `${process.env.API_HOST}/product?offset=1&limit=5&type=1,2,5&whs=VCST&filterNo=${filterProd}`,
+      `${process.env.API_HOST}/product?offset=1&limit=5&type=1,2,4,5&whs=${session?.user.whs.name}&filterNo=${filterProd}`,
       requestOptions
     );
 

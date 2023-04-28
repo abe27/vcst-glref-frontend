@@ -1,4 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+// Whs 003,005 only
 import { DrawerAddNewItem } from "@/components";
 import InputQty from "@/components/drawers/InputQty";
 import MainLayout from "@/components/layout";
@@ -81,7 +82,7 @@ const AddNewAdjustPage = () => {
     };
 
     const res = await fetch(
-      `${process.env.API_HOST}/whouse?offset=1&limit=100&type=4&whs=${session?.user.whs.name}&limit=100&offer=1`,
+      `${process.env.API_HOST}/whouse?offset=1&limit=100&type=4&whs=${session?.user.whs.name}&limit=100&offer=1&filterIn=003,005,YYY`,
       requestOptions
     );
 

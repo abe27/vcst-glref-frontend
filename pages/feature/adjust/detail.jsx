@@ -1,13 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
-import { useSession } from "next-auth/react";
-import MainLayout from "@/components/layout";
-import { Button, Table, Tooltip } from "@nextui-org/react";
-import { DateOnly, DateTime } from "@/hooks";
-import Swal from "sweetalert2/dist/sweetalert2.js";
-import withReactContent from "sweetalert2-react-content";
 import { SkeletonLoading } from "@/components";
+import MainLayout from "@/components/layout";
+import { DateOnly, DateTime } from "@/hooks";
+import { Button, Table, Tooltip } from "@nextui-org/react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/router";
+import { useCallback, useEffect, useState } from "react";
+import withReactContent from "sweetalert2-react-content";
+import Swal from "sweetalert2/dist/sweetalert2.js";
 
 const MySwal = withReactContent(Swal);
 
@@ -104,13 +104,8 @@ const FeatureAdjustDetailPage = () => {
       redirect: "follow",
     };
 
-    // const res = await fetch(
-    //   `${process.env.API_HOST}/order/head?book=${refData[0].glref.fcbook}&whs=${session?.user.whs.name}&limit=1&offer=1&filterOrderNo=${invoiceNo}&fcreftype=PO`,
-    //   requestOptions
-    // );
-
     const res = await fetch(
-      `${process.env.API_HOST}/order/head?whs=${session?.user.whs.name}&limit=1&offer=1&filterOrderNo=${invoiceNo}&fcreftype=PO&fcstep=P`,
+      `${process.env.API_HOST}/order/head?whs=${session?.user.whs.name}&limit=1&offer=1&filterOrderNo=${invoiceNo}&fcreftype=PO&fcstep=1&fcrftype=N`,
       requestOptions
     );
 
@@ -134,10 +129,82 @@ const FeatureAdjustDetailPage = () => {
 
     if (invoiceNo) {
       const invData = await filterPo(invoiceNo);
-      if (invData.length > 0) {
-        console.dir(invData);
+      // console.dir(invData);
+      if (invData.length <= 0) {
+        MySwal.fire({
+          text: `Not found ${invoiceNo.toUpperCase()}!`,
+          icon: "warning",
+          confirmButtonText: "OK",
+        });
+        return;
       }
       setOrderHeader(invData);
+      let doc = [];
+      refData.map((i) => {
+        // console.dir(i);
+        doc.push({
+          fcbranch: i.fcbranch,
+          fccorp: i.fccorp,
+          fcdept: i.fcdept,
+          fcglref: i.fcglref,
+          fcprod: i.fcprod,
+          fcsect: i.fcsect,
+          refprod: i.fcskid,
+          fcstum: i.fcstum,
+          fcstumstd: i.fcstumstd,
+          fcum: i.fcum,
+          fcumstd: i.fcumstd,
+          fcwhouse: i.fcwhouse,
+          fnqty: i.fnqty,
+        });
+      });
+
+      let frm = {
+        orderh: invData[0].fcskid,
+        remark: "-",
+        refprod: doc,
+      };
+
+      /// Patch Data
+      var myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      myHeaders.append("Authorization", session?.user.accessToken);
+
+      var raw = JSON.stringify(frm);
+
+      var requestOptions = {
+        method: "PATCH",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow",
+      };
+
+      const res = await fetch(
+        `${process.env.API_HOST}/gl/ref/${router.query.id}?whs=${session?.user.whs.name}"`,
+        requestOptions
+      );
+
+      if (res.ok) {
+        const data = await res.json();
+        console.dir(data);
+        MySwal.fire({
+          text: `Transfer data successfully.`,
+          icon: "success",
+          confirmButtonText: "OK",
+        });
+        return;
+      }
+
+      if (!res.ok) {
+        const data = await res.json();
+        MySwal.fire({
+          text: data.message,
+          icon: "error",
+          confirmButtonText: "OK",
+        });
+        return;
+      }
+      // console.dir(frm);
       // MySwal.fire({
       //   text: `Would you like transfer data to ${invoiceNo.toUpperCase()}?`,
       //   icon: "warning",
@@ -192,6 +259,28 @@ const FeatureAdjustDetailPage = () => {
       preConfirm: () => handlerConfirmDeleteItem(obj),
     });
   };
+
+  const handleKeyPress = useCallback((e) => {
+    console.log(`Key pressed: ${e.key}`);
+    if (e.shiftKey === true) {
+      if (e.key === "T") {
+        isConfirm();
+        return;
+      }
+
+      if (e.key === "B") {
+        router.back();
+        return;
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleKeyPress);
+    return () => {
+      document.removeEventListener("keydown", handleKeyPress);
+    };
+  }, [handleKeyPress]);
 
   useEffect(() => {
     if (session?.user) {
@@ -295,7 +384,7 @@ const FeatureAdjustDetailPage = () => {
                   ripple
                   onPress={isConfirm}
                 >
-                  Confirm Invoice
+                  Transfer[SHIFT+T]
                 </Button>
               ) : (
                 <></>
@@ -327,13 +416,41 @@ const FeatureAdjustDetailPage = () => {
                     <Table.Cell>{i.fcseq}</Table.Cell>
                     <Table.Cell>{i.prod.fccode}</Table.Cell>
                     <Table.Cell>{i.prod.fcname}</Table.Cell>
-                    <Table.Cell>{i?.fnqty.toLocaleString()}</Table.Cell>
+                    <Table.Cell>
+                      <Button
+                        size={"xs"}
+                        auto
+                        light
+                        iconRight={
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.5}
+                            stroke="currentColor"
+                            className="w-4 h-4"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
+                            />
+                          </svg>
+                        }
+                      >
+                        <span className="font-bold text-sm text-rose-600">
+                          <Tooltip content={`Click here to edit Qty.`}>
+                            {i?.fnqty.toLocaleString()}
+                          </Tooltip>
+                        </span>
+                      </Button>
+                    </Table.Cell>
                     <Table.Cell>{i.unit.fcname}</Table.Cell>
                     {/* <Table.Cell></Table.Cell> */}
                     <Table.Cell>
                       <div className="flex justify-start space-x-4">
                         <div>{DateTime(i.ftlastupd)}</div>
-                        {/* {i.glref.fcstatus ? (
+                        {i.glref.fcstatus ? (
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"
@@ -372,7 +489,7 @@ const FeatureAdjustDetailPage = () => {
                               </svg>
                             </Tooltip>
                           </Button>
-                        )} */}
+                        )}
                       </div>
                     </Table.Cell>
                   </Table.Row>
