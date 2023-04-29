@@ -1,4 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import { faker } from "@faker-js/faker";
 import { SkeletonLoading } from "@/components";
 import MainLayout from "@/components/layout";
 import { DateOnly, DateTime } from "@/hooks";
@@ -11,10 +12,13 @@ import Swal from "sweetalert2/dist/sweetalert2.js";
 
 const MySwal = withReactContent(Swal);
 
+const className = ["primary", "secondary", "warning", "error", "success"];
+
 const FeatureAdjustDetailPage = () => {
   const { data: session } = useSession();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [isClassName, setIsClassName] = useState(className[0]);
   const [refData, setRefData] = useState([]);
   const [orderHeader, setOrderHeader] = useState([]);
   // const [whs, setWhs] = useState("");
@@ -22,7 +26,15 @@ const FeatureAdjustDetailPage = () => {
   const [offer, setOffer] = useState(1);
 
   const fetchData = async (id) => {
-    setRefData([]);
+    setIsClassName(
+      className[
+        faker.datatype.number({
+          min: 0,
+          max: className.length - 1,
+        })
+      ]
+    );
+    // setRefData([]);
     const whs = session?.user.whs.name;
     var myHeaders = new Headers();
     myHeaders.append("Authorization", session?.user.accessToken);
@@ -291,7 +303,6 @@ const FeatureAdjustDetailPage = () => {
 
   useEffect(() => {
     if (session?.user) {
-      // setRefData([]);
       fetchData(router.query.id);
     }
   }, [router]);
@@ -401,7 +412,7 @@ const FeatureAdjustDetailPage = () => {
           <div className="mt-4 pl-8 pr-8">
             {isLoading ? (
               <div className="flex justify-center items-center p-8">
-                <Loading color="primary" />
+                <Loading color={isClassName} />
               </div>
             ) : (
               <Table
