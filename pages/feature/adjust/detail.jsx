@@ -21,7 +21,7 @@ const FeatureAdjustDetailPage = () => {
   const [offer, setOffer] = useState(1);
 
   const fetchData = async (id) => {
-    console.dir(session?.user);
+    setRefData([]);
     const whs = session?.user.whs.name;
     var myHeaders = new Headers();
     myHeaders.append("Authorization", session?.user.accessToken);
@@ -191,6 +191,7 @@ const FeatureAdjustDetailPage = () => {
           text: `Transfer data successfully.`,
           icon: "success",
           confirmButtonText: "OK",
+          preConfirm: () => fetchData(router.query.id),
         });
         return;
       }
@@ -284,7 +285,7 @@ const FeatureAdjustDetailPage = () => {
 
   useEffect(() => {
     if (session?.user) {
-      setRefData([]);
+      // setRefData([]);
       fetchData(router.query.id);
     }
   }, [router]);
