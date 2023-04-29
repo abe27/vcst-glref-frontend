@@ -68,7 +68,7 @@ const DrawerAddNewItem = ({ token, handleAddNew = {} }) => {
 
     // 1,2,5
     const res = await fetch(
-      `${process.env.API_HOST}/product?offset=1&limit=5&type=1,2,4,5&whs=${session?.user.whs.name}&filterNo=${filterProd}`,
+      `${process.env.API_HOST}/product?offset=1&limit=10&type=1,2,4,5&whs=${session?.user.whs.name}&filterNo=${filterProd}`,
       requestOptions
     );
 
