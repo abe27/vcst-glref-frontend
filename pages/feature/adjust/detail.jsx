@@ -2,7 +2,7 @@
 import { SkeletonLoading } from "@/components";
 import MainLayout from "@/components/layout";
 import { DateOnly, DateTime } from "@/hooks";
-import { Button, Table, Tooltip } from "@nextui-org/react";
+import { Button, Loading, Table, Tooltip } from "@nextui-org/react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
@@ -14,6 +14,7 @@ const MySwal = withReactContent(Swal);
 const FeatureAdjustDetailPage = () => {
   const { data: session } = useSession();
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
   const [refData, setRefData] = useState([]);
   const [orderHeader, setOrderHeader] = useState([]);
   // const [whs, setWhs] = useState("");
@@ -105,7 +106,7 @@ const FeatureAdjustDetailPage = () => {
     };
 
     const res = await fetch(
-      `${process.env.API_HOST}/order/head?whs=${session?.user.whs.name}&limit=1&offer=1&filterOrderNo=${invoiceNo}&fcreftype=PO&fcstep=1&fcrftype=N`,
+      `${process.env.API_HOST}/order/head?whs=${session?.user.whs.name}&limit=1&offer=1&filterOrderNo=${invoiceNo}&fcreftype=PO&fcstep=P&fcrftype=N`,
       requestOptions
     );
 
@@ -138,6 +139,7 @@ const FeatureAdjustDetailPage = () => {
         });
         return;
       }
+      setIsLoading(true);
       setOrderHeader(invData);
       let doc = [];
       refData.map((i) => {
@@ -191,8 +193,11 @@ const FeatureAdjustDetailPage = () => {
           text: `Transfer data successfully.`,
           icon: "success",
           confirmButtonText: "OK",
-          preConfirm: () => fetchData(router.query.id),
+          preConfirm: () => {
+            fetchData(router.query.id);
+          },
         });
+        setIsLoading(false);
         return;
       }
 
@@ -203,6 +208,7 @@ const FeatureAdjustDetailPage = () => {
           icon: "error",
           confirmButtonText: "OK",
         });
+        setIsLoading(false);
         return;
       }
       // console.dir(frm);
@@ -393,110 +399,116 @@ const FeatureAdjustDetailPage = () => {
             </div>
           </div>
           <div className="mt-4 pl-8 pr-8">
-            <Table
-              shadow={false}
-              aria-label="Example pagination  table"
-              css={{
-                height: "auto",
-                minWidth: "100%",
-              }}
-              // selectionMode="multiple"
-            >
-              <Table.Header>
-                <Table.Column>#</Table.Column>
-                <Table.Column>FCCODE</Table.Column>
-                <Table.Column>FCNAME</Table.Column>
-                <Table.Column>QTY</Table.Column>
-                <Table.Column>UNIT</Table.Column>
-                {/* <Table.Column>Staus</Table.Column> */}
-                <Table.Column></Table.Column>
-              </Table.Header>
-              <Table.Body>
-                {refData.map((i, x) => (
-                  <Table.Row key={x}>
-                    <Table.Cell>{i.fcseq}</Table.Cell>
-                    <Table.Cell>{i.prod.fccode}</Table.Cell>
-                    <Table.Cell>{i.prod.fcname}</Table.Cell>
-                    <Table.Cell>
-                      <Button
-                        size={"xs"}
-                        auto
-                        light
-                        iconRight={
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            strokeWidth={1.5}
-                            stroke="currentColor"
-                            className="w-4 h-4"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
-                            />
-                          </svg>
-                        }
-                      >
-                        <span className="font-bold text-sm text-rose-600">
-                          <Tooltip content={`Click here to edit Qty.`}>
-                            {i?.fnqty.toLocaleString()}
-                          </Tooltip>
-                        </span>
-                      </Button>
-                    </Table.Cell>
-                    <Table.Cell>{i.unit.fcname}</Table.Cell>
-                    {/* <Table.Cell></Table.Cell> */}
-                    <Table.Cell>
-                      <div className="flex justify-start space-x-4">
-                        <div>{DateTime(i.ftlastupd)}</div>
-                        {i.glref.fcstatus ? (
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            strokeWidth={1.5}
-                            stroke="currentColor"
-                            className="w-4 h-4 text-green-600"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                            />
-                          </svg>
-                        ) : (
-                          <Button
-                            auto
-                            light
-                            size={"xs"}
-                            onPress={() => DeleteItem(i)}
-                          >
-                            <Tooltip content={`Delete ${i.prod.fccode}?`}>
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                strokeWidth={1.5}
-                                stroke="currentColor"
-                                className="w-4 h-4 text-rose-600"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                                />
-                              </svg>
+            {isLoading ? (
+              <div className="flex justify-center items-center p-8">
+                <Loading color="primary" />
+              </div>
+            ) : (
+              <Table
+                shadow={false}
+                aria-label="Example pagination  table"
+                css={{
+                  height: "auto",
+                  minWidth: "100%",
+                }}
+                // selectionMode="multiple"
+              >
+                <Table.Header>
+                  <Table.Column>#</Table.Column>
+                  <Table.Column>FCCODE</Table.Column>
+                  <Table.Column>FCNAME</Table.Column>
+                  <Table.Column>QTY</Table.Column>
+                  <Table.Column>UNIT</Table.Column>
+                  {/* <Table.Column>Staus</Table.Column> */}
+                  <Table.Column></Table.Column>
+                </Table.Header>
+                <Table.Body>
+                  {refData.map((i, x) => (
+                    <Table.Row key={x}>
+                      <Table.Cell>{i.fcseq}</Table.Cell>
+                      <Table.Cell>{i.prod.fccode}</Table.Cell>
+                      <Table.Cell>{i.prod.fcname}</Table.Cell>
+                      <Table.Cell>
+                        <Button
+                          size={"xs"}
+                          auto
+                          light
+                          iconRight={
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              strokeWidth={1.5}
+                              stroke="currentColor"
+                              className="w-4 h-4"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
+                              />
+                            </svg>
+                          }
+                        >
+                          <span className="font-bold text-sm text-rose-600">
+                            <Tooltip content={`Click here to edit Qty.`}>
+                              {i?.fnqty.toLocaleString()}
                             </Tooltip>
-                          </Button>
-                        )}
-                      </div>
-                    </Table.Cell>
-                  </Table.Row>
-                ))}
-              </Table.Body>
-            </Table>
+                          </span>
+                        </Button>
+                      </Table.Cell>
+                      <Table.Cell>{i.unit.fcname}</Table.Cell>
+                      {/* <Table.Cell></Table.Cell> */}
+                      <Table.Cell>
+                        <div className="flex justify-start space-x-4">
+                          <div>{DateTime(i.ftlastupd)}</div>
+                          {i.glref.fcstatus ? (
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              strokeWidth={1.5}
+                              stroke="currentColor"
+                              className="w-4 h-4 text-green-600"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                              />
+                            </svg>
+                          ) : (
+                            <Button
+                              auto
+                              light
+                              size={"xs"}
+                              onPress={() => DeleteItem(i)}
+                            >
+                              <Tooltip content={`Delete ${i.prod.fccode}?`}>
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  strokeWidth={1.5}
+                                  stroke="currentColor"
+                                  className="w-4 h-4 text-rose-600"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                  />
+                                </svg>
+                              </Tooltip>
+                            </Button>
+                          )}
+                        </div>
+                      </Table.Cell>
+                    </Table.Row>
+                  ))}
+                </Table.Body>
+              </Table>
+            )}
           </div>
         </>
       )}
