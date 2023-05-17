@@ -21,7 +21,8 @@ const AddNewAdjustPage = () => {
   const { data: session } = useSession();
   const router = useRouter();
   const toast = useToast();
-  const [selected, setSelected] = useState(new Set(["text"]));
+  const [sectionData, setSectionData] = useState([]);
+  const [selectSection, setSelectSection] = useState(new Set(["text"]));
   const [selectedFromWhs, setSelectedFromWhs] = useState(new Set(["text"]));
   const [selectedToWhs, setSelectedToWhs] = useState(new Set(["text"]));
   const [receiveType, setReceiveType] = useState([]);
@@ -59,6 +60,15 @@ const AddNewAdjustPage = () => {
     }
     return "-";
   }, [selectedToWhs]);
+
+  const selectSectionValue = useMemo(() => {
+    const id = Array.from(selectSection).join(", ").replaceAll("_", " ");
+    const obj = sectionData.filter((i) => i.fcskid === id);
+    if (obj.length > 0) {
+      return `${obj[0].fccode}-${obj[0].fcname}`;
+    }
+    return "-";
+  }, [selectSection]);
 
   // const selectedValue = useMemo(() => {
   //   const id = Array.from(selected).join(", ").replaceAll("_", " ");
@@ -110,6 +120,41 @@ const AddNewAdjustPage = () => {
         }
       });
       setWhsData(doc);
+      return;
+    }
+  };
+
+  const fetchSection = async () => {
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", session?.user.accessToken);
+
+    var requestOptions = {
+      method: "GET",
+      headers: myHeaders,
+      redirect: "follow",
+    };
+
+    const res = await fetch(
+      `${process.env.API_HOST}/formula/section?whs=${session?.user.whs.name}`,
+      requestOptions
+    );
+
+    if (res.ok) {
+      const data = await res.json();
+      console.dir(data.data);
+      setSectionData(data.data);
+      return;
+    }
+
+    if (!res.ok) {
+      toast({
+        title: "Message Error!",
+        description: res.statusText,
+        status: "error",
+        duration: 3500,
+        position: "top",
+        isClosable: true,
+      });
       return;
     }
   };
@@ -200,18 +245,6 @@ const AddNewAdjustPage = () => {
   };
 
   const handlerSaveData = async () => {
-    // if (selectedValue === "-") {
-    //   toast({
-    //     title: "Message Error!",
-    //     description: "Please select receive type!",
-    //     status: "error",
-    //     duration: 3500,
-    //     position: "top",
-    //     isClosable: true,
-    //   });
-    //   return;
-    // }
-
     if (recType === null || recType === undefined) {
       toast({
         title: "Message Error!",
@@ -254,9 +287,11 @@ const AddNewAdjustPage = () => {
         fccode: i.prod.fccode,
         pack: 1,
         qty: i.fnqty,
+        unit: i.prod.fcum,
       });
     });
 
+    const secId = Array.from(selectSection).join(", ").replaceAll("_", " ");
     let doc = {
       fcbook: recBook.fccode,
       fcbranch: "00000",
@@ -265,12 +300,13 @@ const AddNewAdjustPage = () => {
       fcreftype: recBook.fcreftype,
       fcrftype: recBook.fcreftype.substring(0, 1),
       fcstep: "I",
+      fcsec: secId,
       fcremark: remark,
       fddate: DateTimePostman(recDate),
       ref_prod: prod,
     };
 
-    // console.dir(recBook);
+    // console.dir(doc);
     // console.dir(doc);
 
     var myHeaders = new Headers();
@@ -317,31 +353,17 @@ const AddNewAdjustPage = () => {
     }
   };
 
-  // useEffect(() => {
-  //   if (whsData) {
-  //     const slFromWhs = whsData.filter(
-  //       (i) => i.fccode.replaceAll(" ", "") === "YYY"
-  //     );
-  //     if (slFromWhs.length > 0) {
-  //       setRecFromWhs(slFromWhs[0]);
-  //     }
-  //   }
-  // }, [whsData]);
-
   useEffect(() => {
     if (receiveType) {
       const slRecType = receiveType.filter(
         (i) => i.fccode.replaceAll(" ", "") === "MRRP"
       );
-      console.dir(slRecType);
+
       if (slRecType.length > 0) {
         setRecType(slRecType[0]);
       }
 
-      // const selectedValue = useMemo(() => {
-      //   const id = Array.from(selected).join(", ").replaceAll("_", " ");
-      const obj = receiveType.filter((i) => i.fcskid === slRecType.fcskid);
-      // console.dir(obj);
+      const obj = receiveType.filter((i) => i.fcskid === slRecType[0].fcskid);
       if (obj.length > 0) {
         setRecBook(obj[0]);
         setRecToWhs(obj[0].whouse);
@@ -358,12 +380,22 @@ const AddNewAdjustPage = () => {
   }, [refData]);
 
   useEffect(() => {
+    if (sectionData.length > 0) {
+      const slSection = sectionData.filter(
+        (i) => i.fccode.replaceAll(" ", "") === "."
+      );
+      setSelectSection(new Set([slSection[0].fcskid]));
+    }
+  }, [sectionData]);
+
+  useEffect(() => {
     // console.dir(recToWhs);
     let dte = new Date();
     setRecDate(DateOnly(dte));
     if (session?.user) {
       fetchReceiveType();
       fetWhs();
+      fetchSection();
     }
   }, [session]);
 
@@ -371,8 +403,36 @@ const AddNewAdjustPage = () => {
     <MainLayout>
       <div className="lg:my-12 container px-6 mx-auto flex flex-col lg:flex-row items-start lg:items-center justify-between w-full">
         <div className="mt-0">
-          <div className="flex flex-wrap justify-start space-x-4">
-            <div className="flex w-80">
+          <div className="flex flex-wrap justify-start space-x-8">
+            <div className="flex">
+              <Container gap={0} css={{ d: "flex", flexWrap: "nowrap" }}>
+                <div className="mt-3 text-sm font-bold leading-tight text-gray-800">
+                  SECT:
+                </div>
+                <Dropdown>
+                  <Dropdown.Button color={"primary"} light>
+                    {selectSectionValue}
+                  </Dropdown.Button>
+                  <Dropdown.Menu
+                    aria-label="Static Actions"
+                    disallowEmptySelection
+                    selectionMode="single"
+                    selectedKeys={selectSection}
+                    onSelectionChange={setSelectSection}
+                  >
+                    {sectionData.map((i, x) => (
+                      <Dropdown.Item
+                        key={i.fcskid.replaceAll(" ", "")}
+                        description={i.fcname}
+                      >
+                        {`${i.fccode.replaceAll(" ", "")}`}
+                      </Dropdown.Item>
+                    ))}
+                  </Dropdown.Menu>
+                </Dropdown>
+              </Container>
+            </div>
+            <div className="flex">
               <h4 className="mt-3 text-sm font-bold leading-tight text-gray-800">
                 REC. DATE:&nbsp;&nbsp;
               </h4>
@@ -385,32 +445,7 @@ const AddNewAdjustPage = () => {
                 onChange={(e) => setRecDate(e.target.value)}
               />
             </div>
-            {/* <div className="flex w-80">
-              <Container gap={0} css={{ d: "flex", flexWrap: "nowrap" }}>
-                <div className="mt-3 text-sm font-bold leading-tight text-gray-800">
-                  REC. TYPE:
-                </div>
-                <Dropdown>
-                  <Dropdown.Button color={"primary"} light>
-                    {selectedValue}
-                  </Dropdown.Button>
-                  <Dropdown.Menu
-                    aria-label="Static Actions"
-                    disallowEmptySelection
-                    selectionMode="single"
-                    selectedKeys={selected}
-                    onSelectionChange={setSelected}
-                  >
-                    {receiveType.map((i, x) => (
-                      <Dropdown.Item key={i.fcskid} description={i.fcname}>
-                        {`${i.fccode}`}
-                      </Dropdown.Item>
-                    ))}
-                  </Dropdown.Menu>
-                </Dropdown>
-              </Container>
-            </div> */}
-            <div className="flex w-80">
+            <div className="flex">
               <h4 className="mt-3 text-sm font-bold leading-tight text-gray-800">
                 REC TYPE:
               </h4>
@@ -424,7 +459,7 @@ const AddNewAdjustPage = () => {
                 </Button>
               </div>
             </div>
-            <div className="flex w-60">
+            {/* <div className="flex w-60">
               <h4 className="mt-3 text-sm font-bold leading-tight text-gray-800">
                 FROM:
               </h4>
@@ -437,8 +472,8 @@ const AddNewAdjustPage = () => {
                   </h4>
                 </Button>
               </div>
-            </div>
-            <div className="flex w-60">
+            </div> */}
+            <div className="flex">
               <Container gap={0} css={{ d: "flex", flexWrap: "nowrap" }}>
                 <div className="mt-3 text-sm font-bold leading-tight text-gray-800">
                   TO:
@@ -467,7 +502,7 @@ const AddNewAdjustPage = () => {
               </Container>
             </div>
           </div>
-          <div className="mt-2 flex justify-start space-x-4">
+          <div className="mt-2 flex justify-start lg:space-x-4 md:space-x-2">
             <h4 className="text-sm font-bold leading-tight text-gray-800">
               TOTAL:&nbsp;&nbsp;
               <Input

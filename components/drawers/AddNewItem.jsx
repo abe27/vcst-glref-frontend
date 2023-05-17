@@ -23,9 +23,10 @@ const DrawerAddNewItem = ({ token, handleAddNew = {} }) => {
   const [checked, setChecked] = useState("");
   const [filterProd, setFilterProd] = useState("");
   const [listProd, setListProd] = useState([]);
+  const [umID, setUmID] = useState("");
 
-  const AddNewItem = (qty) => {
-    const q = parseFloat(qty);
+  const AddNewItem = (obj) => {
+    const q = parseFloat(obj.qty);
     if (q <= 0) {
       toast({
         title: "Message Warning!",
@@ -40,7 +41,10 @@ const DrawerAddNewItem = ({ token, handleAddNew = {} }) => {
 
     if (checked.length > 0) {
       const prod = listProd.filter((i) => i.fcskid === checked);
-      prod.qty = parseFloat(qty);
+      prod.qty = parseFloat(obj.qty);
+      prod[0].fcum = obj.unit.fcskid;
+      prod[0].product_unit = obj.unit;
+      // console.dir(prod);
       handleAddNew(prod);
       onClose();
       return;
@@ -75,7 +79,6 @@ const DrawerAddNewItem = ({ token, handleAddNew = {} }) => {
     if (res.ok) {
       const data = await res.json();
       setListProd(data.data);
-      // console.dir(data.data);
       return;
     }
 
@@ -109,6 +112,13 @@ const DrawerAddNewItem = ({ token, handleAddNew = {} }) => {
       setListProd([]);
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    const prod = listProd.filter((i) => i.fcskid === checked);
+    if (prod.length > 0) {
+      setUmID(prod[0].fcum);
+    }
+  }, [checked]);
 
   return (
     <>
@@ -190,7 +200,13 @@ const DrawerAddNewItem = ({ token, handleAddNew = {} }) => {
               <Button auto color={"error"} onPress={onClose}>
                 Cancel
               </Button>
-              <EnterQty isVisible={checked.length > 0} isConfirm={AddNewItem} />
+              <EnterQty
+                isVisible={checked.length > 0}
+                isConfirm={AddNewItem}
+                session={session?.user.accessToken}
+                whsName={session?.user.whs.name}
+                umID={umID}
+              />
             </div>
           </DrawerFooter>
         </DrawerContent>
