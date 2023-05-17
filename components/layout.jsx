@@ -162,7 +162,7 @@ const MainLayout = ({
                     description="จัดการข้อมูลการรับสินค้าเข้าคลัง"
                     icon={icons.edit}
                   >
-                    Receive Adjustment
+                    Receive Invoice Adjust
                   </Dropdown.Item>
                   {/* <Dropdown.Item
                     key="usage_metrics"

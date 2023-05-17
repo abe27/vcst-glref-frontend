@@ -27,6 +27,7 @@ const AddNewAdjustPage = () => {
   const [receiveType, setReceiveType] = useState([]);
   const [recBook, setRecBook] = useState({});
   const [whsData, setWhsData] = useState([]);
+  const [recType, setRecType] = useState({});
   const [recFromWhs, setRecFromWhs] = useState({});
   const [recToWhs, setRecToWhs] = useState({});
   const [refData, setRefData] = useState([]);
@@ -59,16 +60,16 @@ const AddNewAdjustPage = () => {
     return "-";
   }, [selectedToWhs]);
 
-  const selectedValue = useMemo(() => {
-    const id = Array.from(selected).join(", ").replaceAll("_", " ");
-    const obj = receiveType.filter((i) => i.fcskid === id);
-    if (obj.length > 0) {
-      setRecBook(obj[0]);
-      setRecToWhs(obj[0].whouse);
-      return `${obj[0].fccode}-${obj[0].fcname}`;
-    }
-    return "-";
-  }, [selected]);
+  // const selectedValue = useMemo(() => {
+  //   const id = Array.from(selected).join(", ").replaceAll("_", " ");
+  //   const obj = receiveType.filter((i) => i.fcskid === id);
+  //   if (obj.length > 0) {
+  //     setRecBook(obj[0]);
+  //     setRecToWhs(obj[0].whouse);
+  //     return `${obj[0].fccode}-${obj[0].fcname}`;
+  //   }
+  //   return "-";
+  // }, [selected]);
 
   const fetWhs = async () => {
     setWhsData([]);
@@ -100,14 +101,15 @@ const AddNewAdjustPage = () => {
 
     if (res.ok) {
       const data = await res.json();
-      setWhsData(data.data);
-      const slFromWhs = data.data.filter(
-        (i) => i.fccode.replaceAll(" ", "") === "YYY"
-      );
-      console.dir(slFromWhs[0]);
-      if (slFromWhs.length > 0) {
-        setRecFromWhs(slFromWhs[0]);
-      }
+      let doc = [];
+      data.data.map((i) => {
+        if (i.fccode.replaceAll(" ", "") !== "YYY") {
+          doc.push(i);
+        } else {
+          setRecFromWhs(i);
+        }
+      });
+      setWhsData(doc);
       return;
     }
   };
@@ -198,7 +200,19 @@ const AddNewAdjustPage = () => {
   };
 
   const handlerSaveData = async () => {
-    if (selectedValue === "-") {
+    // if (selectedValue === "-") {
+    //   toast({
+    //     title: "Message Error!",
+    //     description: "Please select receive type!",
+    //     status: "error",
+    //     duration: 3500,
+    //     position: "top",
+    //     isClosable: true,
+    //   });
+    //   return;
+    // }
+
+    if (recType === null || recType === undefined) {
       toast({
         title: "Message Error!",
         description: "Please select receive type!",
@@ -303,6 +317,38 @@ const AddNewAdjustPage = () => {
     }
   };
 
+  // useEffect(() => {
+  //   if (whsData) {
+  //     const slFromWhs = whsData.filter(
+  //       (i) => i.fccode.replaceAll(" ", "") === "YYY"
+  //     );
+  //     if (slFromWhs.length > 0) {
+  //       setRecFromWhs(slFromWhs[0]);
+  //     }
+  //   }
+  // }, [whsData]);
+
+  useEffect(() => {
+    if (receiveType) {
+      const slRecType = receiveType.filter(
+        (i) => i.fccode.replaceAll(" ", "") === "MRRP"
+      );
+      console.dir(slRecType);
+      if (slRecType.length > 0) {
+        setRecType(slRecType[0]);
+      }
+
+      // const selectedValue = useMemo(() => {
+      //   const id = Array.from(selected).join(", ").replaceAll("_", " ");
+      const obj = receiveType.filter((i) => i.fcskid === slRecType.fcskid);
+      // console.dir(obj);
+      if (obj.length > 0) {
+        setRecBook(obj[0]);
+        setRecToWhs(obj[0].whouse);
+      }
+    }
+  }, [receiveType]);
+
   useEffect(() => {
     let q = 0;
     refData.map((i) => {
@@ -339,7 +385,7 @@ const AddNewAdjustPage = () => {
                 onChange={(e) => setRecDate(e.target.value)}
               />
             </div>
-            <div className="flex w-80">
+            {/* <div className="flex w-80">
               <Container gap={0} css={{ d: "flex", flexWrap: "nowrap" }}>
                 <div className="mt-3 text-sm font-bold leading-tight text-gray-800">
                   REC. TYPE:
@@ -363,6 +409,20 @@ const AddNewAdjustPage = () => {
                   </Dropdown.Menu>
                 </Dropdown>
               </Container>
+            </div> */}
+            <div className="flex w-80">
+              <h4 className="mt-3 text-sm font-bold leading-tight text-gray-800">
+                REC TYPE:
+              </h4>
+              <div className="mt-2">
+                <Button auto light size={"xs"} color={"primary"}>
+                  <h4 className="mt-3 text-sm leading-tight">
+                    {recType !== null && recType.fccode !== undefined
+                      ? `${recType.fccode}-${recType.fcname}`
+                      : "-"}
+                  </h4>
+                </Button>
+              </div>
             </div>
             <div className="flex w-60">
               <h4 className="mt-3 text-sm font-bold leading-tight text-gray-800">

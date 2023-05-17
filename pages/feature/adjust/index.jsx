@@ -68,7 +68,7 @@ const AdjustmentPage = () => {
       <div className="lg:my-12 container px-6 mx-auto flex flex-col lg:flex-row items-start lg:items-center justify-between border-b border-gray-300">
         <div>
           <h4 className="text-2xl font-bold leading-tight text-gray-800">
-            Receive Adjustment
+            Receive Invoice Adjust
           </h4>
           <ul className="flex flex-col md:flex-row items-start md:items-center text-gray-600 text-sm mt-3">
             <li className="flex items-center mr-3 mt-3 md:mt-0">
