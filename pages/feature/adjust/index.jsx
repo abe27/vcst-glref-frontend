@@ -2,12 +2,16 @@
 import { DateOnly, DateString, DateTime, SubDateTime } from "@/hooks";
 import { Button, Input, Loading, Table, Tooltip } from "@nextui-org/react";
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { MainLayout } from "@/components";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useDownloadExcel } from "react-export-table-to-excel";
 
+let d = new Date();
+let dte = DateOnly(d);
 const AdjustmentPage = () => {
+  const tableRef = useRef();
   const router = useRouter();
   const { data: session } = useSession();
   const [reloading, setReloading] = useState(false);
@@ -15,10 +19,18 @@ const AdjustmentPage = () => {
   const [limit, setLimit] = useState(100);
   const [offer, setOffer] = useState(1);
   const [filterGlrefNo, setFilterGlrefNo] = useState("");
-  const [fddate, setFdDate] = useState("");
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [fddate, setFdDate] = useState(dte);
+  const [rowsPerPage, setRowsPerPage] = useState(15);
+  const [showPagination, setShowPagination] = useState(false);
+
+  const { onDownload } = useDownloadExcel({
+    currentTableRef: tableRef.current,
+    filename: `ReceiveAdjust`,
+    sheet: "Receive Monitor Report",
+  });
 
   const fetchData = async () => {
+    setShowPagination(false);
     setReloading(true);
     setGlRefData([]);
     var myHeaders = new Headers();
@@ -38,6 +50,9 @@ const AdjustmentPage = () => {
     if (res.ok) {
       const data = await res.json();
       if (data.data) {
+        if (data.data.length > rowsPerPage) {
+          setShowPagination(true);
+        }
         setGlRefData(data.data);
       }
       setReloading(false);
@@ -53,16 +68,20 @@ const AdjustmentPage = () => {
 
   useEffect(() => {
     if (session?.user) {
-      if (fddate.length > 0) {
-        fetchData();
-      }
+      fetchData();
     }
-  }, [fddate, filterGlrefNo]);
+  }, [fddate]);
 
   useEffect(() => {
-    let d = new Date();
-    setFdDate(DateOnly(d));
-  }, []);
+    if (session?.user) {
+      fetchData();
+    }
+  }, [filterGlrefNo]);
+
+  // useEffect(() => {
+  //   let d = new Date();
+  //   setFdDate(DateOnly(d));
+  // }, []);
   return (
     <MainLayout title="Adjustment Page" description="จัดการข้อมูลการรับสินค้า">
       <div className="lg:my-12 container px-6 mx-auto flex flex-col lg:flex-row items-start lg:items-center justify-between border-b border-gray-300">
@@ -213,7 +232,7 @@ const AdjustmentPage = () => {
           </div>
           <div className="flex justify-end space-x-4 w-full">
             <div className="flex justify-start space-x-2">
-              {/* <Button
+              <Button
                 auto
                 color={"success"}
                 size={"sm"}
@@ -233,9 +252,10 @@ const AdjustmentPage = () => {
                     />
                   </svg>
                 }
+                onPress={onDownload}
               >
                 Export
-              </Button> */}
+              </Button>
             </div>
           </div>
         </div>
@@ -247,6 +267,7 @@ const AdjustmentPage = () => {
             minWidth: "100%",
           }}
           // selectionMode="multiple"
+          ref={tableRef}
         >
           <Table.Header>
             <Table.Column>#</Table.Column>
@@ -272,7 +293,7 @@ const AdjustmentPage = () => {
                   <Table.Cell>
                     {
                       <Tooltip content={i.book.fcname}>
-                        {i.book.fcname.length > 20
+                        {i.book.fcname.length > 50
                           ? `${i.book.fccode}-${i.book.fcname.substring(
                               0,
                               5
