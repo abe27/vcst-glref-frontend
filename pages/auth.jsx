@@ -15,6 +15,30 @@ const AuthPage = () => {
     data.set("username", data.get("username"));
     data.set("password", data.get("password"));
 
+    if (data.get("username") === undefined || data.get("username") === "") {
+      toast({
+        title: "เกิดข้อผิดพลาด",
+        description: "กรุณาระบุชื่อผู้ใช้งานด้วย",
+        status: "error",
+        duration: 9000,
+        isClosable: true,
+        position: "top",
+      });
+      return;
+    }
+
+    if (data.get("password") === undefined || data.get("password") === "") {
+      toast({
+        title: "เกิดข้อผิดพลาด",
+        description: "กรุณาระบุรหัสผ่านด้วย",
+        status: "error",
+        duration: 9000,
+        isClosable: true,
+        position: "top",
+      });
+      return;
+    }
+
     const r = await signIn("credentials", {
       redirect: false,
       username: data.get("username"),
@@ -24,7 +48,7 @@ const AuthPage = () => {
     if (!r.ok) {
       toast({
         title: "เกิดข้อผิดพลาด",
-        description: r.error,
+        description: `ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง!`,
         status: "error",
         duration: 9000,
         isClosable: true,
@@ -80,7 +104,7 @@ const AuthPage = () => {
                   aria-labelledby="username"
                   type="text"
                   className="bg-gray-200 border rounded text-xs font-medium leading-none placeholder-gray-800 text-gray-800 py-3 w-full pl-3 mt-2"
-                  placeholder="e.g: john@gmail.com "
+                  placeholder="username"
                 />
               </div>
               <div className="mt-4 w-full">
@@ -98,6 +122,7 @@ const AuthPage = () => {
                     name="password"
                     type={showpass ? "text" : "password"}
                     className="bg-gray-200 border rounded text-xs font-medium leading-none text-gray-800 py-3 w-full pl-3 mt-2"
+                    placeholder="password"
                   />
                   <div
                     onClick={() => setShowPass(!showpass)}
