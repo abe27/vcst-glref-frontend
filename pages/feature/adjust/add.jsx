@@ -53,7 +53,7 @@ const AddNewAdjustPage = () => {
   const selectedToWhsValue = useMemo(() => {
     const id = Array.from(selectedToWhs).join(", ").replaceAll("_", " ");
     const obj = whsData.filter((i) => i.fcskid === id);
-    console.dir(obj);
+    // console.dir(obj);
     if (obj.length > 0) {
       setRecToWhs(obj[0]);
       return `${obj[0].fccode}-${obj[0].fcname}`;
@@ -141,7 +141,7 @@ const AddNewAdjustPage = () => {
 
     if (res.ok) {
       const data = await res.json();
-      console.dir(data.data);
+      // console.dir(data.data);
       setSectionData(data.data);
       return;
     }
