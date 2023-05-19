@@ -64,29 +64,35 @@ const MainLayout = ({
   ];
 
   const verifyToken = async () => {
-    var myHeaders = new Headers();
-    myHeaders.append("Authorization", session?.user.accessToken);
+    try {
+      var myHeaders = new Headers();
+      myHeaders.append("Authorization", session?.user.accessToken);
 
-    var requestOptions = {
-      method: "GET",
-      headers: myHeaders,
-      redirect: "follow",
-    };
+      var requestOptions = {
+        method: "GET",
+        headers: myHeaders,
+        redirect: "follow",
+      };
 
-    const res = await fetch(`${process.env.API_HOST}/verify`, requestOptions);
-    if (!res.ok) {
-      router.push("/auth");
-    }
+      const res = await fetch(`${process.env.API_HOST}/verify`, requestOptions);
+      if (!res.ok) {
+        router.push("/auth");
+      }
+    } catch {}
   };
 
   const handleUserMenu = (actionKey) => {
-    console.log(actionKey.actionKey);
-    router.push(`/${actionKey.actionKey}`);
+    try {
+      console.log(actionKey.actionKey);
+      router.push(`/${actionKey.actionKey}`);
+    } catch {}
   };
 
   const handleFeatureMenu = (actionKey) => {
-    console.log(actionKey.actionKey);
-    router.push(`/feature/${actionKey.actionKey}`);
+    try {
+      console.log(actionKey.actionKey);
+      router.push(`/feature/${actionKey.actionKey}`);
+    } catch {}
   };
 
   useEffect(() => {
