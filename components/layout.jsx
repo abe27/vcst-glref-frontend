@@ -198,6 +198,7 @@ const MainLayout = ({
                   </Dropdown.Item> */}
                 </Dropdown.Menu>
               </Dropdown>
+              <Navbar.Link href="/stock">Stock</Navbar.Link>
             </Navbar.Content>
             <Navbar.Content
               css={{
