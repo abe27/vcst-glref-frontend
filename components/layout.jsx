@@ -64,35 +64,29 @@ const MainLayout = ({
   ];
 
   const verifyToken = async () => {
-    try {
-      var myHeaders = new Headers();
-      myHeaders.append("Authorization", session?.user.accessToken);
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", session?.user.accessToken);
 
-      var requestOptions = {
-        method: "GET",
-        headers: myHeaders,
-        redirect: "follow",
-      };
+    var requestOptions = {
+      method: "GET",
+      headers: myHeaders,
+      redirect: "follow",
+    };
 
-      const res = await fetch(`${process.env.API_HOST}/verify`, requestOptions);
-      if (!res.ok) {
-        router.push("/auth");
-      }
-    } catch {}
+    const res = await fetch(`${process.env.API_HOST}/verify`, requestOptions);
+    if (!res.ok) {
+      router.push("/auth");
+    }
   };
 
   const handleUserMenu = (actionKey) => {
-    try {
-      console.log(actionKey.actionKey);
-      router.push(`/${actionKey.actionKey}`);
-    } catch {}
+    console.log(actionKey.actionKey);
+    router.push(`/${actionKey.actionKey}`);
   };
 
   const handleFeatureMenu = (actionKey) => {
-    try {
-      console.log(actionKey.actionKey);
-      router.push(`/feature/${actionKey.actionKey}`);
-    } catch {}
+    console.log(actionKey.actionKey);
+    router.push(`/feature/${actionKey.actionKey}`);
   };
 
   useEffect(() => {
@@ -124,7 +118,7 @@ const MainLayout = ({
               </Link>
             </Navbar.Brand>
             <Navbar.Content hideIn="xs" variant="underline">
-              <Navbar.Link href="/">Home</Navbar.Link>
+              <Navbar.Link onPress={() => router.push("/")}>Home</Navbar.Link>
               <Dropdown isBordered>
                 <Navbar.Item>
                   <Dropdown.Button
@@ -204,7 +198,9 @@ const MainLayout = ({
                   </Dropdown.Item> */}
                 </Dropdown.Menu>
               </Dropdown>
-              <Navbar.Link href="/stock">Stock</Navbar.Link>
+              <Navbar.Link onPress={() => router.push("/stock")}>
+                Stock
+              </Navbar.Link>
             </Navbar.Content>
             <Navbar.Content
               css={{

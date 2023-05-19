@@ -101,7 +101,6 @@ const AuthPage = () => {
                 <input
                   id="username"
                   name="username"
-                  aria-labelledby="username"
                   type="text"
                   className="bg-gray-200 border rounded text-xs font-medium leading-none placeholder-gray-800 text-gray-800 py-3 w-full pl-3 mt-2"
                   placeholder="username"

@@ -91,6 +91,7 @@ const EnterQty = ({
           <div className="flex justify-between">
             <div className="flex justify-start w-full">
               <Input
+                id="qty"
                 clearable
                 bordered
                 fullWidth

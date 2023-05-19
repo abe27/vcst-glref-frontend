@@ -37,6 +37,7 @@ const InputQty = ({ obj = {}, isConfirm = {} }) => {
         </Modal.Header>
         <Modal.Body>
           <Input
+            id="qty"
             clearable
             bordered
             fullWidth

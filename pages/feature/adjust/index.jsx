@@ -206,6 +206,7 @@ const AdjustmentPage = () => {
                 REC. DATE:
               </span>
               <Input
+                id="recDate"
                 clearable
                 size="sm"
                 shadow={false}
@@ -220,6 +221,7 @@ const AdjustmentPage = () => {
                 REF. No.:
               </span>
               <Input
+                id="recNo"
                 clearable
                 size="sm"
                 shadow={false}
