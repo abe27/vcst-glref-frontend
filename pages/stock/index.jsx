@@ -187,7 +187,7 @@ const StockPage = () => {
           </div>
         </div>
       </div>
-      <div className="px-6">
+      <div className="container px-6 mx-auto">
         <Table
           bordered
           shadow={false}
