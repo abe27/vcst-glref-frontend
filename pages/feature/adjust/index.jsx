@@ -198,7 +198,7 @@ const AdjustmentPage = () => {
           </Button>
         </div>
       </div>
-      <div>
+      <div className="container px-6 mx-auto">
         <div className="mb-4 flex justify-between">
           <div className="flex justify-start space-x-4 w-full">
             <div className="flex justify-start space-x-2">

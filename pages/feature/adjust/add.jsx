@@ -559,14 +559,16 @@ const AddNewAdjustPage = () => {
         </div>
       </div>
       <div className="border-b border-gray-300 w-full" />
-      <div className="flex justify-end pr-8 mt-2">
-        <DrawerAddNewItem
-          token={session?.user.accessToken}
-          handleAddNew={handleAddNew}
-        />
+      <div className="container px-6 mx-auto">
+        <div className="flex justify-end pr-8 mt-2">
+          <DrawerAddNewItem
+            token={session?.user.accessToken}
+            handleAddNew={handleAddNew}
+          />
+        </div>
       </div>
       {refData.length > 0 ? (
-        <div className="mt-4 pl-8 pr-8">
+        <div className="container px-6 mx-auto">
           <Table
             shadow={false}
             aria-label="Example pagination  table"

@@ -234,6 +234,14 @@ const FeatureAdjustDetailPage = () => {
       //   cancelButtonColor: "#CF3A24",
       //   preConfirm: () => handleSuccess(invoiceNo.toUpperCase()),
       // });
+    } else {
+      MySwal.fire({
+        text: "Please enter your invoice?",
+        icon: "error",
+        confirmButtonText: "OK",
+        preConfirm: () => isConfirm(),
+      });
+      return;
     }
   };
 
@@ -409,7 +417,7 @@ const FeatureAdjustDetailPage = () => {
               )}
             </div>
           </div>
-          <div className="mt-4 pl-8 pr-8">
+          <div className="container px-6 mx-auto">
             {isLoading ? (
               <div className="flex justify-center items-center p-8">
                 <Loading color={isClassName} />

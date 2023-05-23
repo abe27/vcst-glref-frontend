@@ -1,4 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import { useToast } from "@chakra-ui/react";
 import { useEffect, useState, useMemo } from "react";
 
 const { Button, Modal, Text, Input, Dropdown } = require("@nextui-org/react");
@@ -10,6 +11,7 @@ const EnterQty = ({
   whsName = null,
   umID = null,
 }) => {
+  const toast = useToast();
   const [qty, setQty] = useState(0);
   const [selected, setSelected] = useState(new Set(["text"]));
   const [umData, setUmData] = useState([]);
@@ -57,6 +59,21 @@ const EnterQty = ({
     }
   };
 
+  const checkSelectItem = async () => {
+    if (!isVisible) {
+      toast({
+        title: "Message Error!",
+        description: "Please Select Item!",
+        status: "error",
+        duration: 3500,
+        isClosable: true,
+        position: "top",
+      });
+      return;
+    }
+    setVisible(isVisible);
+  };
+
   useEffect(() => {
     if (umData.length > 0) {
       // const unit = data.data.filter((i) => i.fcskid === umID);
@@ -73,7 +90,7 @@ const EnterQty = ({
 
   return (
     <>
-      <Button auto color={"primary"} onPress={() => setVisible(isVisible)}>
+      <Button auto color={"primary"} onPress={checkSelectItem}>
         Add Now
       </Button>
       <Modal
