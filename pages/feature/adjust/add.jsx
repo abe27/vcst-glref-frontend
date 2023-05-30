@@ -306,8 +306,7 @@ const AddNewAdjustPage = () => {
       ref_prod: prod,
     };
 
-    // console.dir(doc);
-    // console.dir(doc);
+    console.dir(doc);
 
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
@@ -322,35 +321,35 @@ const AddNewAdjustPage = () => {
       redirect: "follow",
     };
 
-    const res = await fetch(
-      `${process.env.API_HOST}/gl/ref?whs=${session?.user.whs.name}`,
-      requestOptions
-    );
+    // const res = await fetch(
+    //   `${process.env.API_HOST}/gl/ref?whs=${session?.user.whs.name}`,
+    //   requestOptions
+    // );
 
-    if (res.ok) {
-      toast({
-        title: "System Message",
-        description: "Save data is successfully.",
-        status: "success",
-        duration: 3500,
-        position: "top",
-        isClosable: true,
-      });
-      router.back();
-      return;
-    }
+    // if (res.ok) {
+    //   toast({
+    //     title: "System Message",
+    //     description: "Save data is successfully.",
+    //     status: "success",
+    //     duration: 3500,
+    //     position: "top",
+    //     isClosable: true,
+    //   });
+    //   router.back();
+    //   return;
+    // }
 
-    if (!res.ok) {
-      toast({
-        title: "Message Error!",
-        description: res.statusText,
-        status: "error",
-        duration: 3500,
-        position: "top",
-        isClosable: true,
-      });
-      return;
-    }
+    // if (!res.ok) {
+    //   toast({
+    //     title: "Message Error!",
+    //     description: res.statusText,
+    //     status: "error",
+    //     duration: 3500,
+    //     position: "top",
+    //     isClosable: true,
+    //   });
+    //   return;
+    // }
   };
 
   useEffect(() => {
